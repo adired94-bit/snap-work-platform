@@ -99,6 +99,45 @@ def get_client():
     return genai.Client(api_key=api_key)
 
 
+def _strip_json_fence(text):
+    """מנקה גידור קוד ```json אם המודל הוסיף אותו."""
+    text = (text or "").strip()
+    if text.startswith("```"):
+        text = text.strip("`")
+        if text.lstrip().lower().startswith("json"):
+            text = text.lstrip()[4:]
+    return text.strip()
+
+
+def fetch_market_news(client, symbol):
+    """מחפש באינטרנט חדשות ודעת אנליסטים על הנכס, באמצעות Google Search grounding."""
+    prompt = (
+        f'חפש באינטרנט מידע עדכני (מהחודשים האחרונים) על הנכס/מניה: "{symbol}".\n'
+        "החזר אך ורק אובייקט JSON תקין (ללא טקסט נוסף, ללא גידור קוד), במבנה הבא:\n"
+        "{\n"
+        '  "company_name": "שם החברה/הנכס",\n'
+        '  "analyst_rating": "strong_buy | buy | hold | sell | strong_sell | unknown",\n'
+        '  "rating_label": "תווית בעברית: קנייה חזקה / קנייה / החזק / מכירה / מכירה חזקה / לא ידוע",\n'
+        '  "consensus": "משפט-שניים על קונצנזוס האנליסטים בעברית",\n'
+        '  "price_target": "מחיר יעד ממוצע אם קיים, אחרת \'לא ידוע\'",\n'
+        '  "news": [\n'
+        '    {"title": "כותרת בעברית", "summary": "תקציר קצר בעברית", "sentiment": "positive | negative | neutral"}\n'
+        "  ]\n"
+        "}\n"
+        "כלול עד 5 כותרות חדשות רלוונטיות ועדכניות. אם אין מספיק מידע, החזר "
+        "rating_label='לא ידוע' ורשימת news ריקה. אל תמציא נתונים."
+    )
+    resp = client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents=[prompt],
+        config=types.GenerateContentConfig(
+            tools=[types.Tool(google_search=types.GoogleSearch())],
+            temperature=0.3,
+        ),
+    )
+    return json.loads(_strip_json_fence(resp.text))
+
+
 @app.route("/")
 def index():
     return render_template("index.html", timeframes=TIMEFRAME_LABELS)
@@ -177,20 +216,28 @@ def analyze():
             return jsonify({"error": f"חרגת ממכסת השימוש החינמית. פרטים: {msg[:220]}"}), 429
         return jsonify({"error": f"שגיאה בקריאה ל-Gemini: {msg[:220]}"}), 502
 
-    text = (response.text or "").strip()
+    text = _strip_json_fence(response.text)
     if not text:
         return jsonify({"error": "לא התקבל ניתוח מהמודל."}), 502
-
-    # ניקוי גידור קוד אם המודל הוסיף בטעות ```json
-    if text.startswith("```"):
-        text = text.strip("`")
-        if text.lstrip().lower().startswith("json"):
-            text = text.lstrip()[4:]
 
     try:
         data = json.loads(text)
     except json.JSONDecodeError:
         return jsonify({"error": "תקלה בפענוח התשובה.", "raw": text[:500]}), 502
+
+    # שלב שני: חדשות ודעת אנליסטים (חיפוש באינטרנט) על הסימול שזוהה
+    symbol = (data.get("symbol_guess") or "").strip()
+    known = bool(symbol) and symbol.lower() not in ("לא ידוע", "unknown", "n/a", "none")
+    if not known and notes:
+        symbol = notes
+        known = True
+    if known:
+        try:
+            data["news_report"] = fetch_market_news(client, symbol)
+        except Exception as e:  # noqa: BLE001 — החדשות הן תוספת; לא מפילות את הניתוח
+            data["news_report"] = {"error": str(e)[:160]}
+    else:
+        data["news_report"] = {"unavailable": True}
 
     return jsonify({"analysis": data})
 

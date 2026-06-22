@@ -164,7 +164,7 @@
 
     <div class="spinner" id="spinner">
       <div class="dot"></div>
-      <p>מנתח את הגרף... זה עשוי לקחת מספר שניות</p>
+      <p>מנתח את הגרף ואוסף חדשות ודעת אנליסטים... זה עשוי לקחת מספר שניות</p>
     </div>
 
     <div id="results"></div>
@@ -242,6 +242,38 @@
       return arr.map(x => `<li class="${cls||''}">${esc(x)}</li>`).join('');
     }
 
+    function renderNews(nr) {
+      if (!nr) return '';
+      if (nr.unavailable) {
+        return `<div class="card"><h3>📰 חדשות ודעת אנליסטים</h3>
+          <div class="summary-box" style="color:var(--muted)">לא זוהה סימול מהגרף. כדי לקבל חדשות ודעת אנליסטים — כתוב את שם המניה או הסימול בשדה "הערות" ונתח שוב.</div></div>`;
+      }
+      if (nr.error) {
+        return `<div class="card"><h3>📰 חדשות ודעת אנליסטים</h3>
+          <div class="summary-box" style="color:var(--muted)">לא הצלחנו למשוך חדשות כרגע. נסה שוב מאוחר יותר.</div></div>`;
+      }
+      const r = String(nr.analyst_rating || 'unknown').toLowerCase();
+      let cls = 'bias-neutral';
+      if (r.includes('buy')) cls = 'bias-long';
+      else if (r.includes('sell')) cls = 'bias-short';
+      const news = (nr.news || []).map(n => {
+        const s = n.sentiment || 'neutral';
+        const dot = s === 'positive' ? '🟢' : s === 'negative' ? '🔴' : '⚪';
+        return `<li>${dot} <b>${esc(n.title)}</b><br><span style="color:var(--muted);font-size:13px">${esc(n.summary)}</span></li>`;
+      }).join('') || '<li style="color:var(--muted)">אין כותרות זמינות כרגע</li>';
+      return `
+        <div class="card">
+          <h3>📰 חדשות ודעת אנליסטים</h3>
+          <div class="bias-banner ${cls}" style="margin-bottom:14px">
+            <div><div class="conf">המלצת אנליסטים</div><div class="big">${esc(nr.rating_label || 'לא ידוע')}</div></div>
+            <div style="text-align:left"><div class="conf">מחיר יעד</div><div class="big" style="font-size:18px">${esc(nr.price_target || '—')}</div></div>
+          </div>
+          <div class="kv"><div class="k">קונצנזוס אנליסטים</div><div class="summary-box">${esc(nr.consensus || '—')}</div></div>
+          <div class="k" style="margin-top:14px">כותרות אחרונות</div>
+          <ul class="clean" style="margin-top:6px">${news}</ul>
+        </div>`;
+    }
+
     function render(a) {
       const biasMap = { long: ['long','📈 לונג'], short: ['short','📉 שורט'], neutral: ['neutral','⚖️ נייטרלי'] };
       const [biasCls, biasLabel] = biasMap[a.overall_bias] || biasMap.neutral;
@@ -314,6 +346,8 @@
           <h3>📝 סיכום</h3>
           <div class="summary-box">${esc(a.summary)}</div>
         </div>
+
+        ${renderNews(a.news_report)}
       `;
       results.classList.add('show');
       results.scrollIntoView({ behavior: 'smooth' });
