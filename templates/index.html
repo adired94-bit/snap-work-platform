@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>📊 מנתח הגרפים החכם</title>
+  <style>
+    :root {
+      --bg: #0b0e14;
+      --panel: #151a24;
+      --panel-2: #1c232f;
+      --border: #2a3340;
+      --text: #e6edf3;
+      --muted: #8b97a6;
+      --accent: #2ea6ff;
+      --green: #25c281;
+      --red: #f6465d;
+      --amber: #f0b429;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Heebo", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    .container { max-width: 920px; margin: 0 auto; padding: 24px 16px 64px; }
+    header { text-align: center; margin-bottom: 28px; }
+    header h1 { font-size: 28px; margin: 0 0 6px; }
+    header p { color: var(--muted); margin: 0; font-size: 15px; }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 18px;
+    }
+
+    .drop {
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      padding: 36px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: .15s;
+      background: var(--panel-2);
+    }
+    .drop:hover, .drop.drag { border-color: var(--accent); background: #1a2430; }
+    .drop .icon { font-size: 40px; }
+    .drop p { margin: 8px 0 0; color: var(--muted); }
+    #preview { max-width: 100%; max-height: 320px; border-radius: 10px; margin-top: 14px; display: none; }
+
+    .row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px; align-items: flex-end; }
+    .field { flex: 1; min-width: 160px; }
+    label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+    select, textarea {
+      width: 100%; background: var(--panel-2); color: var(--text);
+      border: 1px solid var(--border); border-radius: 8px; padding: 10px; font-size: 14px;
+      font-family: inherit;
+    }
+    textarea { resize: vertical; min-height: 44px; }
+
+    button.analyze {
+      width: 100%; margin-top: 16px; padding: 14px;
+      background: var(--accent); color: #04121f; border: none; border-radius: 10px;
+      font-size: 16px; font-weight: 700; cursor: pointer; transition: .15s;
+    }
+    button.analyze:hover { filter: brightness(1.08); }
+    button.analyze:disabled { opacity: .5; cursor: not-allowed; }
+
+    .spinner { display: none; text-align: center; padding: 24px; color: var(--muted); }
+    .spinner.show { display: block; }
+    .spinner .dot { display:inline-block; width:38px; height:38px; border:4px solid var(--border);
+      border-top-color: var(--accent); border-radius:50%; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .error { display:none; background:#2a1518; border:1px solid var(--red); color:#ffb3bd;
+      padding:14px; border-radius:10px; margin-bottom:16px; }
+    .error.show { display:block; }
+
+    #results { display: none; }
+    #results.show { display: block; }
+
+    .bias-banner {
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      padding:18px; border-radius:12px; margin-bottom:16px; font-weight:700;
+    }
+    .bias-long { background:rgba(37,194,129,.12); border:1px solid var(--green); color:var(--green); }
+    .bias-short { background:rgba(246,70,93,.12); border:1px solid var(--red); color:var(--red); }
+    .bias-neutral { background:rgba(240,180,41,.12); border:1px solid var(--amber); color:var(--amber); }
+    .bias-banner .big { font-size: 24px; }
+    .conf { font-size:13px; color:var(--muted); font-weight:500; }
+
+    h3 { font-size: 16px; margin: 0 0 12px; display:flex; align-items:center; gap:8px; }
+    .grid { display:grid; grid-template-columns: 1fr 1fr; gap:14px; }
+    @media (max-width: 640px){ .grid { grid-template-columns: 1fr; } }
+
+    ul.clean { list-style:none; padding:0; margin:0; }
+    ul.clean li { padding:7px 10px; background:var(--panel-2); border-radius:8px; margin-bottom:6px; font-size:14px;
+      border-right:3px solid var(--border); }
+    li.sup { border-right-color: var(--green); }
+    li.res { border-right-color: var(--red); }
+    li.liq { border-right-color: var(--accent); }
+
+    .kv { margin-bottom:10px; }
+    .kv .k { color:var(--muted); font-size:13px; }
+    .kv .v { font-size:15px; }
+    .tps { display:flex; gap:6px; flex-wrap:wrap; }
+    .tp { background:rgba(37,194,129,.15); color:var(--green); padding:4px 10px; border-radius:20px; font-size:13px; }
+
+    .summary-box { background:var(--panel-2); border-radius:10px; padding:14px; font-size:15px; }
+    .disclaimer { color:var(--muted); font-size:12px; text-align:center; margin-top:24px; line-height:1.5; }
+    .tag { display:inline-block; background:var(--panel-2); border:1px solid var(--border);
+      padding:2px 8px; border-radius:6px; font-size:12px; color:var(--muted); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>📊 מנתח הגרפים החכם</h1>
+      <p>העלה צילום מסך של גרף וקבל ניתוח מסחר מלא — כניסה, יציאה, נזילות, כסף חכם ועוד</p>
+    </header>
+
+    <div class="card">
+      <div class="drop" id="drop">
+        <div class="icon">🖼️</div>
+        <p><b>גרור לכאן תמונה</b> או לחץ לבחירה</p>
+        <p style="font-size:12px">PNG · JPG · GIF · WEBP</p>
+        <input type="file" id="file" accept="image/*" hidden>
+        <img id="preview" alt="תצוגה מקדימה">
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label for="timeframe">טווח זמן</label>
+          <select id="timeframe">
+            {% for key, label in timeframes.items() %}
+            <option value="{{ key }}" {% if key == '1h' %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="field" style="flex:2">
+          <label for="notes">הערות / הקשר (אופציונלי)</label>
+          <textarea id="notes" placeholder="לדוגמה: ביטקוין, מחפש כניסת לונג..."></textarea>
+        </div>
+      </div>
+
+      <button class="analyze" id="go" disabled>נתח את הגרף</button>
+    </div>
+
+    <div class="error" id="error"></div>
+
+    <div class="spinner" id="spinner">
+      <div class="dot"></div>
+      <p>מנתח את הגרף... זה עשוי לקחת מספר שניות</p>
+    </div>
+
+    <div id="results"></div>
+
+    <p class="disclaimer">
+      ⚠️ הניתוח נועד למטרות חינוכיות בלבד ואינו מהווה ייעוץ השקעות.
+      מסחר בשווקים פיננסיים כרוך בסיכון. קבל החלטות באחריותך.
+    </p>
+  </div>
+
+  <script>
+    const fileInput = document.getElementById('file');
+    const drop = document.getElementById('drop');
+    const preview = document.getElementById('preview');
+    const go = document.getElementById('go');
+    const spinner = document.getElementById('spinner');
+    const errorBox = document.getElementById('error');
+    const results = document.getElementById('results');
+    let selectedFile = null;
+
+    drop.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', e => handleFile(e.target.files[0]));
+    ['dragover','dragenter'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('drag'); }));
+    ['dragleave','drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('drag'); }));
+    drop.addEventListener('drop', e => { if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
+
+    function handleFile(f) {
+      if (!f || !f.type.startsWith('image/')) return;
+      selectedFile = f;
+      const reader = new FileReader();
+      reader.onload = e => { preview.src = e.target.result; preview.style.display = 'block'; };
+      reader.readAsDataURL(f);
+      go.disabled = false;
+    }
+
+    go.addEventListener('click', analyze);
+
+    async function analyze() {
+      if (!selectedFile) return;
+      errorBox.classList.remove('show');
+      results.classList.remove('show');
+      results.innerHTML = '';
+      spinner.classList.add('show');
+      go.disabled = true;
+
+      const fd = new FormData();
+      fd.append('image', selectedFile);
+      fd.append('timeframe', document.getElementById('timeframe').value);
+      fd.append('notes', document.getElementById('notes').value);
+
+      try {
+        const res = await fetch('/api/analyze', { method: 'POST', body: fd });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'תקלה לא ידועה');
+        render(data.analysis);
+      } catch (err) {
+        errorBox.textContent = '❌ ' + err.message;
+        errorBox.classList.add('show');
+      } finally {
+        spinner.classList.remove('show');
+        go.disabled = false;
+      }
+    }
+
+    function esc(s) {
+      return String(s ?? '').replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+    }
+    function list(arr, cls) {
+      if (!arr || !arr.length) return '<li style="color:var(--muted)">—</li>';
+      return arr.map(x => `<li class="${cls||''}">${esc(x)}</li>`).join('');
+    }
+
+    function render(a) {
+      const biasMap = { long: ['long','📈 לונג'], short: ['short','📉 שורט'], neutral: ['neutral','⚖️ נייטרלי'] };
+      const [biasCls, biasLabel] = biasMap[a.overall_bias] || biasMap.neutral;
+      const t = a.trade_setup || {};
+      const sm = a.smart_money || {};
+
+      const liq = (a.liquidity_zones || []).map(z =>
+        `<li class="liq"><b>${esc(z.type)}</b> @ ${esc(z.price)} — <span style="color:var(--muted)">${esc(z.note)}</span></li>`
+      ).join('') || '<li style="color:var(--muted)">—</li>';
+
+      results.innerHTML = `
+        <div class="bias-banner bias-${biasCls}">
+          <div><div class="big">${biasLabel}</div>
+          <div class="conf">${esc(a.symbol_guess)} · ${esc(a.timeframe)}</div></div>
+          <div style="text-align:left"><div class="conf">רמת ביטחון</div>
+          <div class="big">${esc(a.confidence)}%</div></div>
+        </div>
+
+        <div class="card">
+          <h3>🎯 סטאפ מסחר</h3>
+          <div class="grid">
+            <div>
+              <div class="kv"><div class="k">כיוון</div><div class="v">${esc(t.direction)}</div></div>
+              <div class="kv"><div class="k">אזור כניסה</div><div class="v">${esc(t.entry_zone)}</div></div>
+              <div class="kv"><div class="k">סטופ לוס 🛑</div><div class="v">${esc(t.stop_loss)}</div></div>
+            </div>
+            <div>
+              <div class="kv"><div class="k">יעדי רווח 🎯</div>
+                <div class="tps">${(t.take_profits||[]).map(p=>`<span class="tp">${esc(p)}</span>`).join('') || '—'}</div></div>
+              <div class="kv"><div class="k">יחס סיכוי/סיכון</div><div class="v">${esc(t.risk_reward)}</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>🏗️ מבנה השוק</h3>
+          <div class="summary-box">${esc(a.market_structure)}</div>
+        </div>
+
+        <div class="grid">
+          <div class="card"><h3>🟢 תמיכות</h3><ul class="clean">${list(a.support_levels,'sup')}</ul></div>
+          <div class="card"><h3>🔴 התנגדויות</h3><ul class="clean">${list(a.resistance_levels,'res')}</ul></div>
+        </div>
+
+        <div class="card">
+          <h3>💧 אזורי נזילות (Liquidity)</h3>
+          <ul class="clean">${liq}</ul>
+        </div>
+
+        <div class="card">
+          <h3>🐋 כסף חכם (Smart Money)</h3>
+          <div class="kv"><div class="k">איפה הכסף החכם נכנס / ייכנס</div>
+            <div class="summary-box">${esc(sm.where_smart_money_entering)}</div></div>
+          <div class="grid" style="margin-top:12px">
+            <div><div class="k">Order Blocks</div><ul class="clean">${list(sm.order_blocks,'liq')}</ul></div>
+            <div><div class="k">Fair Value Gaps (FVG)</div><ul class="clean">${list(sm.fair_value_gaps,'liq')}</ul></div>
+          </div>
+          <div class="kv" style="margin-top:12px"><div class="k">צבירה / חלוקה</div>
+            <div class="v">${esc(sm.accumulation_distribution)}</div></div>
+        </div>
+
+        <div class="card">
+          <h3>🔍 תצפיות מפתח</h3>
+          <ul class="clean">${list(a.key_observations)}</ul>
+          <div class="kv" style="margin-top:12px"><div class="k">ביטול הניתוח (Invalidation)</div>
+            <div class="v">${esc(a.invalidation)}</div></div>
+        </div>
+
+        <div class="card">
+          <h3>📝 סיכום</h3>
+          <div class="summary-box">${esc(a.summary)}</div>
+        </div>
+      `;
+      results.classList.add('show');
+      results.scrollIntoView({ behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>
