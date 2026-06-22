@@ -143,6 +143,12 @@ def index():
     return render_template("index.html", timeframes=TIMEFRAME_LABELS)
 
 
+@app.route("/health")
+def health():
+    """נקודת בדיקה קלה — משמשת שירות keep-alive כדי שהשרת לא יירדם."""
+    return "ok", 200
+
+
 @app.route("/api/analyze", methods=["POST"])
 def analyze():
     client = get_client()
