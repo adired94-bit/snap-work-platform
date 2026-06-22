@@ -62,6 +62,13 @@
     }
     textarea { resize: vertical; min-height: 44px; }
 
+    .camera-btn {
+      width: 100%; margin-top: 12px; padding: 13px;
+      background: var(--panel-2); color: var(--text); border: 1px solid var(--accent);
+      border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; transition: .15s;
+    }
+    .camera-btn:hover { background: #1a2430; }
+
     button.analyze {
       width: 100%; margin-top: 16px; padding: 14px;
       background: var(--accent); color: #04121f; border: none; border-radius: 10px;
@@ -132,6 +139,9 @@
         <img id="preview" alt="תצוגה מקדימה">
       </div>
 
+      <button type="button" class="camera-btn" id="cameraBtn">📷 צלם תמונה מהמצלמה</button>
+      <input type="file" id="camera" accept="image/*" capture="environment" hidden>
+
       <div class="row">
         <div class="field">
           <label for="timeframe">טווח זמן</label>
@@ -175,8 +185,13 @@
     const results = document.getElementById('results');
     let selectedFile = null;
 
+    const cameraInput = document.getElementById('camera');
+    const cameraBtn = document.getElementById('cameraBtn');
+
     drop.addEventListener('click', () => fileInput.click());
     fileInput.addEventListener('change', e => handleFile(e.target.files[0]));
+    cameraBtn.addEventListener('click', () => cameraInput.click());
+    cameraInput.addEventListener('change', e => handleFile(e.target.files[0]));
     ['dragover','dragenter'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('drag'); }));
     ['dragleave','drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('drag'); }));
     drop.addEventListener('drop', e => { if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
