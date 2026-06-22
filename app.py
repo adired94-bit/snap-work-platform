@@ -10,6 +10,7 @@ Chart Analyzer — ניתוח גרפים חכם באמצעות Google Gemini (Vi
 
 import json
 import os
+import time
 
 from dotenv import load_dotenv
 from flask import Flask, jsonify, render_template, request
@@ -136,26 +137,45 @@ def analyze():
     if notes:
         user_text += f"\n\nהקשר נוסף מהמשתמש: {notes}"
 
-    try:
-        response = client.models.generate_content(
-            model=MODEL,
-            contents=[
-                types.Part.from_bytes(data=raw, mime_type=media_type),
-                user_text,
-            ],
-            config=types.GenerateContentConfig(
-                system_instruction=SYSTEM_PROMPT,
-                response_mime_type="application/json",
-                temperature=0.4,
-            ),
-        )
-    except Exception as e:  # noqa: BLE001 — מציג למשתמש הודעה ידידותית
-        msg = str(e)
-        if "API key" in msg or "API_KEY" in msg or "PERMISSION" in msg:
-            return jsonify({"error": "מפתח ה-API לא תקין. בדוק את GEMINI_API_KEY."}), 502
-        if "RESOURCE_EXHAUSTED" in msg or "quota" in msg.lower():
-            return jsonify({"error": "חרגת ממכסת השימוש החינמית הרגעית. המתן דקה ונסה שוב."}), 429
-        return jsonify({"error": f"שגיאה בקריאה ל-Gemini: {msg[:160]}"}), 502
+    # רשימת מודלים לנסות לפי הסדר (אם הראשון חוסם במכסה — ננסה את הבא)
+    models_to_try = [MODEL, "gemini-2.5-flash", "gemini-flash-latest"]
+    response = None
+    last_msg = ""
+
+    for model_name in models_to_try:
+        for attempt in range(2):  # ניסיון + ניסיון חוזר אחד עם המתנה
+            try:
+                response = client.models.generate_content(
+                    model=model_name,
+                    contents=[
+                        types.Part.from_bytes(data=raw, mime_type=media_type),
+                        user_text,
+                    ],
+                    config=types.GenerateContentConfig(
+                        system_instruction=SYSTEM_PROMPT,
+                        response_mime_type="application/json",
+                        temperature=0.4,
+                    ),
+                )
+                break
+            except Exception as e:  # noqa: BLE001
+                last_msg = str(e)
+                is_rate = "RESOURCE_EXHAUSTED" in last_msg or "429" in last_msg or "quota" in last_msg.lower()
+                if is_rate and attempt == 0:
+                    time.sleep(4)
+                    continue
+                break  # שגיאה שאינה ניתנת לניסיון חוזר, או שכבר ניסינו — עבור למודל הבא
+        if response is not None:
+            break
+
+    if response is None:
+        msg = last_msg
+        low = msg.lower()
+        if "api key" in low or "api_key" in low or "permission" in low or "invalid" in low and "key" in low:
+            return jsonify({"error": f"בעיית מפתח API. פרטים: {msg[:200]}"}), 502
+        if "RESOURCE_EXHAUSTED" in msg or "429" in msg or "quota" in low:
+            return jsonify({"error": f"חרגת ממכסת השימוש החינמית. פרטים: {msg[:220]}"}), 429
+        return jsonify({"error": f"שגיאה בקריאה ל-Gemini: {msg[:220]}"}), 502
 
     text = (response.text or "").strip()
     if not text:
