@@ -18,12 +18,13 @@
 2. בחר את המאגר **snap-work-platform**
 3. Render יזהה אוטומטית את הקובץ `render.yaml` — לחץ **Apply** / **Create**
 
-### שלב 3 — הוספת מפתח ה-API
-1. אחרי היצירה, היכנס לשירות → לשונית **Environment**
-2. לחץ **Add Environment Variable**:
-   - Key: `ANTHROPIC_API_KEY`
-   - Value: המפתח שלך מ-https://console.anthropic.com/settings/keys
-3. שמור — Render יבנה ויפרוס אוטומטית (1-2 דקות)
+### שלב 3 — הוספת מפתח ה-API (חינמי)
+1. קבל מפתח חינמי: כנס ל-https://aistudio.google.com/apikey → **Create API key** → העתק.
+2. ב-Render: היכנס לשירות → לשונית **Environment**
+3. לחץ **Add Environment Variable**:
+   - Key: `GEMINI_API_KEY`
+   - Value: המפתח שהעתקת מ-Google AI Studio
+4. שמור — Render יבנה ויפרוס אוטומטית (1-2 דקות)
 
 ### שלב 4 — מוכן!
 למעלה בעמוד תופיע הכתובת (למשל `https://chart-analyzer.onrender.com`).
@@ -50,4 +51,4 @@
 
 ## ⚠️ אבטחת מפתח ה-API
 - אל תשתף את המפתח עם אף אחד ואל תכתוב אותו בתוך הקוד.
-- אם שיתפת אותו בטעות — בטל אותו וצור חדש ב-https://console.anthropic.com/settings/keys
+- אם שיתפת אותו בטעות — בטל אותו וצור חדש ב-https://aistudio.google.com/apikey

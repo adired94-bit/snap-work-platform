@@ -20,10 +20,10 @@
 # 1. התקנת ספריות
 pip install -r requirements.txt
 
-# 2. הגדרת מפתח API
+# 2. הגדרת מפתח API (חינמי)
 cp .env.example .env
-# ערוך את .env והכנס את ה-ANTHROPIC_API_KEY שלך
-# (מקבלים מפתח ב: https://console.anthropic.com/settings/keys)
+# ערוך את .env והכנס את ה-GEMINI_API_KEY שלך
+# (מקבלים מפתח חינמי ב: https://aistudio.google.com/apikey)
 
 # 3. הרצה
 python app.py
@@ -34,14 +34,14 @@ python app.py
 ## איך זה עובד
 
 הקצה הקדמי (`templates/index.html`) שולח את התמונה ל-`/api/analyze`.
-השרת (`app.py`) שולח את התמונה למודל `claude-opus-4-8` יחד עם פרומפט מערכת
-של אנליסט מסחר (Price Action + Smart Money Concepts), ומשתמש ב-Structured Outputs
-כדי לקבל JSON מובנה שמוצג בממשק בעברית.
+השרת (`app.py`) שולח את התמונה למודל `gemini-2.0-flash` (Google Gemini, שכבה חינמית)
+יחד עם פרומפט מערכת של אנליסט מסחר (Price Action + Smart Money Concepts),
+ומקבל JSON מובנה שמוצג בממשק בעברית.
 
 ## מבנה הפרויקט
 
 ```
-app.py                  # שרת Flask + קריאה ל-Claude Vision
+app.py                  # שרת Flask + קריאה ל-Gemini Vision
 templates/index.html    # ממשק המשתמש (עברית, RTL)
 requirements.txt        # ספריות Python
 .env.example            # תבנית להגדרת מפתח ה-API

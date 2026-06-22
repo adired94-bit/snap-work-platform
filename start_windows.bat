@@ -32,8 +32,9 @@ if not exist .venv (
 REM בקשת מפתח API אם אין קובץ .env
 if not exist .env (
   echo.
-  set /p APIKEY="הדבק כאן את מפתח ה-API שלך מ-console.anthropic.com: "
-  >.env echo ANTHROPIC_API_KEY=%APIKEY%
+  echo קבל מפתח חינמי ב: https://aistudio.google.com/apikey
+  set /p APIKEY="הדבק כאן את מפתח ה-Gemini שלך: "
+  >.env echo GEMINI_API_KEY=%APIKEY%
 )
 
 echo.

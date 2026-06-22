@@ -8,5 +8,5 @@ services:
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
     envVars:
-      - key: ANTHROPIC_API_KEY
-        sync: false   # מוגדר ידנית בלוח הבקרה של Render (סוד - לא נשמר בקוד)
+      - key: GEMINI_API_KEY
+        sync: false   # מוגדר ידנית בלוח הבקרה של Render (מפתח חינמי מ-aistudio.google.com/apikey)
