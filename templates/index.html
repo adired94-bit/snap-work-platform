@@ -12,169 +12,161 @@
   <link rel="apple-touch-icon" href="/static/icon-192.png">
   <link rel="icon" type="image/png" href="/static/icon-192.png">
   <style>
-    :root {
-      --bg: #0b0e14;
-      --panel: #151a24;
-      --panel-2: #1c232f;
-      --border: #2a3340;
-      --text: #e6edf3;
-      --muted: #8b97a6;
-      --accent: #2ea6ff;
-      --green: #25c281;
-      --red: #f6465d;
-      --amber: #f0b429;
+    :root{
+      --bg:#0b0e14; --panel:#151a24; --panel-2:#1c232f; --border:#2a3340;
+      --text:#e6edf3; --muted:#8b97a6; --accent:#2ea6ff; --green:#25c281; --red:#f6465d; --amber:#f0b429;
     }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: "Segoe UI", "Heebo", Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
-    }
-    .container { max-width: 920px; margin: 0 auto; padding: 24px 16px 64px; }
-    header { text-align: center; margin-bottom: 28px; }
-    header h1 { font-size: 28px; margin: 0 0 6px; }
-    header p { color: var(--muted); margin: 0; font-size: 15px; }
+    *{box-sizing:border-box;}
+    body{margin:0;font-family:"Segoe UI","Heebo",Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;}
+    .container{max-width:920px;margin:0 auto;padding:20px 16px 64px;}
+    header{text-align:center;margin-bottom:18px;}
+    header h1{font-size:26px;margin:0 0 6px;}
+    header p{color:var(--muted);margin:0;font-size:14px;}
 
-    .card {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 20px;
-      margin-bottom: 18px;
-    }
+    .tabs{display:flex;gap:8px;margin-bottom:16px;}
+    .tab{flex:1;padding:11px;text-align:center;background:var(--panel-2);border:1px solid var(--border);
+      border-radius:10px;cursor:pointer;font-weight:600;font-size:14px;color:var(--muted);}
+    .tab.active{color:var(--text);border-color:var(--accent);background:#1a2430;}
 
-    .drop {
-      border: 2px dashed var(--border);
-      border-radius: 12px;
-      padding: 36px 16px;
-      text-align: center;
-      cursor: pointer;
-      transition: .15s;
-      background: var(--panel-2);
-    }
-    .drop:hover, .drop.drag { border-color: var(--accent); background: #1a2430; }
-    .drop .icon { font-size: 40px; }
-    .drop p { margin: 8px 0 0; color: var(--muted); }
-    #preview { max-width: 100%; max-height: 320px; border-radius: 10px; margin-top: 14px; display: none; }
+    .card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:16px;}
 
-    .row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px; align-items: flex-end; }
-    .field { flex: 1; min-width: 160px; }
-    label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
-    select, textarea {
-      width: 100%; background: var(--panel-2); color: var(--text);
-      border: 1px solid var(--border); border-radius: 8px; padding: 10px; font-size: 14px;
-      font-family: inherit;
-    }
-    textarea { resize: vertical; min-height: 44px; }
+    .drop{border:2px dashed var(--border);border-radius:12px;padding:30px 16px;text-align:center;cursor:pointer;transition:.15s;background:var(--panel-2);}
+    .drop:hover,.drop.drag{border-color:var(--accent);background:#1a2430;}
+    .drop .icon{font-size:38px;}
+    .drop p{margin:8px 0 0;color:var(--muted);}
+    .preview{max-width:100%;max-height:280px;border-radius:10px;margin-top:12px;display:none;}
 
-    .camera-btn {
-      width: 100%; margin-top: 12px; padding: 13px;
-      background: var(--panel-2); color: var(--text); border: 1px solid var(--accent);
-      border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; transition: .15s;
-    }
-    .camera-btn:hover { background: #1a2430; }
+    .camera-btn{width:100%;margin-top:12px;padding:13px;background:var(--panel-2);color:var(--text);
+      border:1px solid var(--accent);border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;}
+    .camera-btn:hover{background:#1a2430;}
 
-    button.analyze {
-      width: 100%; margin-top: 16px; padding: 14px;
-      background: var(--accent); color: #04121f; border: none; border-radius: 10px;
-      font-size: 16px; font-weight: 700; cursor: pointer; transition: .15s;
-    }
-    button.analyze:hover { filter: brightness(1.08); }
-    button.analyze:disabled { opacity: .5; cursor: not-allowed; }
+    .row{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px;align-items:flex-end;}
+    .field{flex:1;min-width:150px;}
+    label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px;}
+    select,textarea,input[type=number]{width:100%;background:var(--panel-2);color:var(--text);
+      border:1px solid var(--border);border-radius:8px;padding:10px;font-size:14px;font-family:inherit;}
+    textarea{resize:vertical;min-height:44px;}
 
-    .spinner { display: none; text-align: center; padding: 24px; color: var(--muted); }
-    .spinner.show { display: block; }
-    .spinner .dot { display:inline-block; width:38px; height:38px; border:4px solid var(--border);
-      border-top-color: var(--accent); border-radius:50%; animation: spin 1s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    .ghost-btn{width:100%;margin-top:12px;padding:11px;background:transparent;color:var(--accent);
+      border:1px dashed var(--accent);border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;}
+    .extra-slot{border:1px solid var(--border);border-radius:10px;padding:12px;margin-top:12px;background:var(--panel-2);}
+    .extra-slot .top{display:flex;gap:8px;align-items:center;}
+    .extra-slot .rm{background:none;border:none;color:var(--red);font-size:20px;cursor:pointer;padding:0 6px;}
+    .extra-slot .pick{flex:1;text-align:center;padding:9px;border:1px dashed var(--border);border-radius:8px;color:var(--muted);cursor:pointer;font-size:13px;}
+    .extra-slot .thumb{max-height:90px;border-radius:6px;margin-top:8px;display:none;}
 
-    .error { display:none; background:#2a1518; border:1px solid var(--red); color:#ffb3bd;
-      padding:14px; border-radius:10px; margin-bottom:16px; }
-    .error.show { display:block; }
+    button.analyze{width:100%;margin-top:16px;padding:14px;background:var(--accent);color:#04121f;border:none;
+      border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;}
+    button.analyze:hover{filter:brightness(1.08);} button.analyze:disabled{opacity:.5;cursor:not-allowed;}
 
-    #results { display: none; }
-    #results.show { display: block; }
+    .spinner{display:none;text-align:center;padding:24px;color:var(--muted);}
+    .spinner.show{display:block;}
+    .spinner .dot{display:inline-block;width:38px;height:38px;border:4px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+    .error{display:none;background:#2a1518;border:1px solid var(--red);color:#ffb3bd;padding:14px;border-radius:10px;margin-bottom:16px;}
+    .error.show{display:block;}
 
-    .bias-banner {
-      display:flex; align-items:center; justify-content:space-between; gap:12px;
-      padding:18px; border-radius:12px; margin-bottom:16px; font-weight:700;
-    }
-    .bias-long { background:rgba(37,194,129,.12); border:1px solid var(--green); color:var(--green); }
-    .bias-short { background:rgba(246,70,93,.12); border:1px solid var(--red); color:var(--red); }
-    .bias-neutral { background:rgba(240,180,41,.12); border:1px solid var(--amber); color:var(--amber); }
-    .bias-banner .big { font-size: 24px; }
-    .conf { font-size:13px; color:var(--muted); font-weight:500; }
+    #results{display:none;} #results.show{display:block;}
+    .bias-banner{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px;border-radius:12px;margin-bottom:16px;font-weight:700;}
+    .bias-long{background:rgba(37,194,129,.12);border:1px solid var(--green);color:var(--green);}
+    .bias-short{background:rgba(246,70,93,.12);border:1px solid var(--red);color:var(--red);}
+    .bias-neutral{background:rgba(240,180,41,.12);border:1px solid var(--amber);color:var(--amber);}
+    .bias-banner .big{font-size:24px;} .conf{font-size:13px;color:var(--muted);font-weight:500;}
 
-    h3 { font-size: 16px; margin: 0 0 12px; display:flex; align-items:center; gap:8px; }
-    .grid { display:grid; grid-template-columns: 1fr 1fr; gap:14px; }
-    @media (max-width: 640px){ .grid { grid-template-columns: 1fr; } }
+    h3{font-size:16px;margin:0 0 12px;display:flex;align-items:center;gap:8px;}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+    @media(max-width:640px){.grid{grid-template-columns:1fr;}}
+    ul.clean{list-style:none;padding:0;margin:0;}
+    ul.clean li{padding:7px 10px;background:var(--panel-2);border-radius:8px;margin-bottom:6px;font-size:14px;border-right:3px solid var(--border);}
+    li.sup{border-right-color:var(--green);} li.res{border-right-color:var(--red);} li.liq{border-right-color:var(--accent);}
+    .kv{margin-bottom:10px;} .kv .k{color:var(--muted);font-size:13px;} .kv .v{font-size:15px;}
+    .tps{display:flex;gap:6px;flex-wrap:wrap;} .tp{background:rgba(37,194,129,.15);color:var(--green);padding:4px 10px;border-radius:20px;font-size:13px;}
+    .summary-box{background:var(--panel-2);border-radius:10px;padding:14px;font-size:15px;}
+    .disclaimer{color:var(--muted);font-size:12px;text-align:center;margin-top:24px;line-height:1.5;}
 
-    ul.clean { list-style:none; padding:0; margin:0; }
-    ul.clean li { padding:7px 10px; background:var(--panel-2); border-radius:8px; margin-bottom:6px; font-size:14px;
-      border-right:3px solid var(--border); }
-    li.sup { border-right-color: var(--green); }
-    li.res { border-right-color: var(--red); }
-    li.liq { border-right-color: var(--accent); }
+    /* risk calculator */
+    .calc-out{background:var(--panel-2);border-radius:10px;padding:12px;margin-top:12px;font-size:14px;border-right:3px solid var(--accent);}
+    .calc-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 
-    .kv { margin-bottom:10px; }
-    .kv .k { color:var(--muted); font-size:13px; }
-    .kv .v { font-size:15px; }
-    .tps { display:flex; gap:6px; flex-wrap:wrap; }
-    .tp { background:rgba(37,194,129,.15); color:var(--green); padding:4px 10px; border-radius:20px; font-size:13px; }
+    /* live price */
+    .price-row{display:flex;gap:16px;align-items:baseline;margin-bottom:10px;flex-wrap:wrap;}
+    .price-now{font-size:26px;font-weight:700;} .chg-up{color:var(--green);} .chg-down{color:var(--red);}
+    .warn{background:rgba(240,180,41,.12);border:1px solid var(--amber);color:var(--amber);padding:10px 12px;border-radius:8px;font-size:14px;margin-bottom:10px;}
 
-    .summary-box { background:var(--panel-2); border-radius:10px; padding:14px; font-size:15px; }
-    .disclaimer { color:var(--muted); font-size:12px; text-align:center; margin-top:24px; line-height:1.5; }
-    .tag { display:inline-block; background:var(--panel-2); border:1px solid var(--border);
-      padding:2px 8px; border-radius:6px; font-size:12px; color:var(--muted); }
+    /* journal */
+    #journal{display:none;} #journal.show{display:block;}
+    .stat-row{display:flex;gap:10px;margin-bottom:14px;}
+    .stat{flex:1;background:var(--panel-2);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center;}
+    .stat .n{font-size:22px;font-weight:700;} .stat .l{font-size:12px;color:var(--muted);}
+    .jrec{background:var(--panel-2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px;}
+    .jrec .h{display:flex;justify-content:space-between;align-items:center;gap:8px;}
+    .jrec .sym{font-weight:700;} .jrec .meta{font-size:12px;color:var(--muted);}
+    .jrec .acts{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;}
+    .jrec .acts button{flex:1;padding:7px;border-radius:8px;border:1px solid var(--border);background:var(--panel);color:var(--text);cursor:pointer;font-size:13px;}
+    .pill{display:inline-block;padding:2px 9px;border-radius:20px;font-size:12px;font-weight:600;}
+    .p-open{background:rgba(46,166,255,.15);color:var(--accent);}
+    .p-win{background:rgba(37,194,129,.15);color:var(--green);}
+    .p-loss{background:rgba(246,70,93,.15);color:var(--red);}
+    .p-be{background:rgba(240,180,41,.15);color:var(--amber);}
+    .save-btn{width:100%;margin-top:6px;padding:13px;background:var(--green);color:#04130c;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;}
   </style>
 </head>
 <body>
   <div class="container">
     <header>
       <h1>📊 מנתח הגרפים החכם</h1>
-      <p>העלה צילום מסך של גרף וקבל ניתוח מסחר מלא — כניסה, יציאה, נזילות, כסף חכם ועוד</p>
+      <p>ניתוח טכני · מחשבון סיכון · יומן מסחר · חדשות אנליסטים</p>
     </header>
 
-    <div class="card">
-      <div class="drop" id="drop">
-        <div class="icon">🖼️</div>
-        <p><b>גרור לכאן תמונה</b> או לחץ לבחירה</p>
-        <p style="font-size:12px">PNG · JPG · GIF · WEBP</p>
-        <input type="file" id="file" accept="image/*" hidden>
-        <img id="preview" alt="תצוגה מקדימה">
-      </div>
-
-      <button type="button" class="camera-btn" id="cameraBtn">📷 צלם תמונה מהמצלמה</button>
-      <input type="file" id="camera" accept="image/*" capture="environment" hidden>
-
-      <div class="row">
-        <div class="field">
-          <label for="timeframe">טווח זמן</label>
-          <select id="timeframe">
-            {% for key, label in timeframes.items() %}
-            <option value="{{ key }}" {% if key == '1h' %}selected{% endif %}>{{ label }}</option>
-            {% endfor %}
-          </select>
-        </div>
-        <div class="field" style="flex:2">
-          <label for="notes">הערות / הקשר (אופציונלי)</label>
-          <textarea id="notes" placeholder="לדוגמה: ביטקוין, מחפש כניסת לונג..."></textarea>
-        </div>
-      </div>
-
-      <button class="analyze" id="go" disabled>נתח את הגרף</button>
+    <div class="tabs">
+      <div class="tab active" id="tab-analyze" onclick="showView('analyze')">🔍 ניתוח</div>
+      <div class="tab" id="tab-journal" onclick="showView('journal')">📒 יומן מסחר</div>
     </div>
 
-    <div class="error" id="error"></div>
+    <!-- ===== ANALYZE VIEW ===== -->
+    <div id="view-analyze">
+      <div class="card">
+        <div class="drop" id="drop">
+          <div class="icon">🖼️</div>
+          <p><b>גרור לכאן תמונה</b> או לחץ לבחירה</p>
+          <p style="font-size:12px">PNG · JPG · GIF · WEBP</p>
+          <input type="file" id="file" accept="image/*" hidden>
+          <img id="preview" class="preview" alt="תצוגה מקדימה">
+        </div>
+        <button type="button" class="camera-btn" id="cameraBtn">📷 צלם תמונה מהמצלמה</button>
+        <input type="file" id="camera" accept="image/*" capture="environment" hidden>
 
-    <div class="spinner" id="spinner">
-      <div class="dot"></div>
-      <p>מנתח את הגרף ואוסף חדשות ודעת אנליסטים... זה עשוי לקחת מספר שניות</p>
+        <div class="row">
+          <div class="field">
+            <label for="timeframe">טווח זמן</label>
+            <select id="timeframe">
+              {% for key, label in timeframes.items() %}
+              <option value="{{ key }}" {% if key == '1h' %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="field" style="flex:2">
+            <label for="notes">סימול / הערות (אופציונלי)</label>
+            <textarea id="notes" placeholder="לדוגמה: AAPL, ביטקוין, מחפש לונג..."></textarea>
+          </div>
+        </div>
+
+        <div id="extra-slots"></div>
+        <button type="button" class="ghost-btn" id="addTf">➕ הוסף טווח זמן נוסף (ניתוח Top-Down)</button>
+
+        <button class="analyze" id="go" disabled>נתח את הגרף</button>
+      </div>
+
+      <div class="error" id="error"></div>
+      <div class="spinner" id="spinner">
+        <div class="dot"></div>
+        <p>מנתח את הגרף ואוסף חדשות ודעת אנליסטים... זה עשוי לקחת מספר שניות</p>
+      </div>
+      <div id="results"></div>
     </div>
 
-    <div id="results"></div>
+    <!-- ===== JOURNAL VIEW ===== -->
+    <div id="journal"></div>
 
     <p class="disclaimer">
       ⚠️ הניתוח נועד למטרות חינוכיות בלבד ואינו מהווה ייעוץ השקעות.
@@ -183,122 +175,167 @@
   </div>
 
   <script>
-    const fileInput = document.getElementById('file');
-    const drop = document.getElementById('drop');
-    const preview = document.getElementById('preview');
-    const go = document.getElementById('go');
-    const spinner = document.getElementById('spinner');
-    const errorBox = document.getElementById('error');
-    const results = document.getElementById('results');
-    let selectedFile = null;
+    /* ============ Upload (primary + extra timeframes) ============ */
+    const fileInput=document.getElementById('file'), drop=document.getElementById('drop'),
+      preview=document.getElementById('preview'), go=document.getElementById('go'),
+      cameraInput=document.getElementById('camera'), cameraBtn=document.getElementById('cameraBtn');
+    let primaryFile=null;
+    let extraSlots=[]; // {id, file, tf}
 
-    const cameraInput = document.getElementById('camera');
-    const cameraBtn = document.getElementById('cameraBtn');
+    drop.addEventListener('click',()=>fileInput.click());
+    fileInput.addEventListener('change',e=>setPrimary(e.target.files[0]));
+    cameraBtn.addEventListener('click',()=>cameraInput.click());
+    cameraInput.addEventListener('change',e=>setPrimary(e.target.files[0]));
+    ['dragover','dragenter'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('drag');}));
+    ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('drag');}));
+    drop.addEventListener('drop',e=>{if(e.dataTransfer.files[0])setPrimary(e.dataTransfer.files[0]);});
 
-    drop.addEventListener('click', () => fileInput.click());
-    fileInput.addEventListener('change', e => handleFile(e.target.files[0]));
-    cameraBtn.addEventListener('click', () => cameraInput.click());
-    cameraInput.addEventListener('change', e => handleFile(e.target.files[0]));
-    ['dragover','dragenter'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('drag'); }));
-    ['dragleave','drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('drag'); }));
-    drop.addEventListener('drop', e => { if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
-
-    function handleFile(f) {
-      if (!f || !f.type.startsWith('image/')) return;
-      selectedFile = f;
-      const reader = new FileReader();
-      reader.onload = e => { preview.src = e.target.result; preview.style.display = 'block'; };
-      reader.readAsDataURL(f);
-      go.disabled = false;
+    function setPrimary(f){
+      if(!f||!f.type.startsWith('image/'))return;
+      primaryFile=f;
+      const r=new FileReader(); r.onload=e=>{preview.src=e.target.result;preview.style.display='block';};
+      r.readAsDataURL(f); go.disabled=false;
     }
 
-    go.addEventListener('click', analyze);
-
-    async function analyze() {
-      if (!selectedFile) return;
-      errorBox.classList.remove('show');
-      results.classList.remove('show');
-      results.innerHTML = '';
-      spinner.classList.add('show');
-      go.disabled = true;
-
-      const fd = new FormData();
-      fd.append('image', selectedFile);
-      fd.append('timeframe', document.getElementById('timeframe').value);
-      fd.append('notes', document.getElementById('notes').value);
-
-      try {
-        const res = await fetch('/api/analyze', { method: 'POST', body: fd });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'תקלה לא ידועה');
-        render(data.analysis);
-      } catch (err) {
-        errorBox.textContent = '❌ ' + err.message;
-        errorBox.classList.add('show');
-      } finally {
-        spinner.classList.remove('show');
-        go.disabled = false;
-      }
-    }
-
-    function esc(s) {
-      return String(s ?? '').replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
-    }
-    function list(arr, cls) {
-      if (!arr || !arr.length) return '<li style="color:var(--muted)">—</li>';
-      return arr.map(x => `<li class="${cls||''}">${esc(x)}</li>`).join('');
-    }
-
-    function renderNews(nr) {
-      if (!nr) return '';
-      if (nr.unavailable) {
-        return `<div class="card"><h3>📰 חדשות ודעת אנליסטים</h3>
-          <div class="summary-box" style="color:var(--muted)">לא זוהה סימול מהגרף. כדי לקבל חדשות ודעת אנליסטים — כתוב את שם המניה או הסימול בשדה "הערות" ונתח שוב.</div></div>`;
-      }
-      if (nr.error) {
-        return `<div class="card"><h3>📰 חדשות ודעת אנליסטים</h3>
-          <div class="summary-box" style="color:var(--muted)">לא הצלחנו למשוך חדשות כרגע. נסה שוב מאוחר יותר.</div></div>`;
-      }
-      const r = String(nr.analyst_rating || 'unknown').toLowerCase();
-      let cls = 'bias-neutral';
-      if (r.includes('buy')) cls = 'bias-long';
-      else if (r.includes('sell')) cls = 'bias-short';
-      const news = (nr.news || []).map(n => {
-        const s = n.sentiment || 'neutral';
-        const dot = s === 'positive' ? '🟢' : s === 'negative' ? '🔴' : '⚪';
-        return `<li>${dot} <b>${esc(n.title)}</b><br><span style="color:var(--muted);font-size:13px">${esc(n.summary)}</span></li>`;
-      }).join('') || '<li style="color:var(--muted)">אין כותרות זמינות כרגע</li>';
-      return `
-        <div class="card">
-          <h3>📰 חדשות ודעת אנליסטים</h3>
-          <div class="bias-banner ${cls}" style="margin-bottom:14px">
-            <div><div class="conf">המלצת אנליסטים</div><div class="big">${esc(nr.rating_label || 'לא ידוע')}</div></div>
-            <div style="text-align:left"><div class="conf">מחיר יעד</div><div class="big" style="font-size:18px">${esc(nr.price_target || '—')}</div></div>
-          </div>
-          <div class="kv"><div class="k">קונצנזוס אנליסטים</div><div class="summary-box">${esc(nr.consensus || '—')}</div></div>
-          <div class="k" style="margin-top:14px">כותרות אחרונות</div>
-          <ul class="clean" style="margin-top:6px">${news}</ul>
-        </div>`;
-    }
-
-    function render(a) {
-      const biasMap = { long: ['long','📈 לונג'], short: ['short','📉 שורט'], neutral: ['neutral','⚖️ נייטרלי'] };
-      const [biasCls, biasLabel] = biasMap[a.overall_bias] || biasMap.neutral;
-      const t = a.trade_setup || {};
-      const sm = a.smart_money || {};
-
-      const liq = (a.liquidity_zones || []).map(z =>
-        `<li class="liq"><b>${esc(z.type)}</b> @ ${esc(z.price)} — <span style="color:var(--muted)">${esc(z.note)}</span></li>`
-      ).join('') || '<li style="color:var(--muted)">—</li>';
-
-      results.innerHTML = `
-        <div class="bias-banner bias-${biasCls}">
-          <div><div class="big">${biasLabel}</div>
-          <div class="conf">${esc(a.symbol_guess)} · ${esc(a.timeframe)}</div></div>
-          <div style="text-align:left"><div class="conf">רמת ביטחון</div>
-          <div class="big">${esc(a.confidence)}%</div></div>
+    const TF_OPTS=`{% for key,label in timeframes.items() %}<option value="{{key}}" {% if key=='1d' %}selected{% endif %}>{{label}}</option>{% endfor %}`;
+    document.getElementById('addTf').addEventListener('click',addSlot);
+    function addSlot(){
+      if(extraSlots.length>=2){alert('אפשר עד 3 טווחי זמן יחד.');return;}
+      const id='s'+Date.now();
+      const slot={id,file:null,tf:'1d'};
+      extraSlots.push(slot);
+      const div=document.createElement('div');
+      div.className='extra-slot'; div.id=id;
+      div.innerHTML=`
+        <div class="top">
+          <select style="flex:1" onchange="setSlotTf('${id}',this.value)">${TF_OPTS}</select>
+          <span class="pick" onclick="document.getElementById('${id}-f').click()">🖼️ בחר / 📷 צלם תמונה</span>
+          <button class="rm" onclick="removeSlot('${id}')">✕</button>
         </div>
+        <input type="file" id="${id}-f" accept="image/*" hidden onchange="setSlotFile('${id}',this.files[0])">
+        <img class="thumb" id="${id}-t">`;
+      document.getElementById('extra-slots').appendChild(div);
+    }
+    function setSlotTf(id,v){const s=extraSlots.find(x=>x.id===id); if(s)s.tf=v;}
+    function setSlotFile(id,f){
+      const s=extraSlots.find(x=>x.id===id); if(!s||!f)return; s.file=f;
+      const img=document.getElementById(id+'-t'); const r=new FileReader();
+      r.onload=e=>{img.src=e.target.result;img.style.display='block';}; r.readAsDataURL(f);
+    }
+    function removeSlot(id){extraSlots=extraSlots.filter(x=>x.id!==id); const el=document.getElementById(id); if(el)el.remove();}
 
+    go.addEventListener('click',analyze);
+    async function analyze(){
+      if(!primaryFile)return;
+      document.getElementById('error').classList.remove('show');
+      const results=document.getElementById('results');
+      results.classList.remove('show'); results.innerHTML='';
+      document.getElementById('spinner').classList.add('show'); go.disabled=true;
+
+      const fd=new FormData();
+      fd.append('images',primaryFile);
+      fd.append('timeframes',document.getElementById('timeframe').value);
+      extraSlots.filter(s=>s.file).forEach(s=>{fd.append('images',s.file);fd.append('timeframes',s.tf);});
+      fd.append('notes',document.getElementById('notes').value);
+
+      try{
+        const res=await fetch('/api/analyze',{method:'POST',body:fd});
+        const data=await res.json();
+        if(!res.ok)throw new Error(data.error||'תקלה לא ידועה');
+        lastAnalysis=data.analysis; render(data.analysis);
+      }catch(err){
+        const e=document.getElementById('error'); e.textContent='❌ '+err.message; e.classList.add('show');
+      }finally{
+        document.getElementById('spinner').classList.remove('show'); go.disabled=false;
+      }
+    }
+
+    /* ============ Helpers ============ */
+    function esc(s){return String(s??'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+    function list(arr,cls){if(!arr||!arr.length)return '<li style="color:var(--muted)">—</li>';return arr.map(x=>`<li class="${cls||''}">${esc(x)}</li>`).join('');}
+    let lastAnalysis=null;
+
+    /* ============ Risk calculator ============ */
+    function calcRisk(){
+      const acc=parseFloat(document.getElementById('rc-account').value);
+      const pct=parseFloat(document.getElementById('rc-risk').value);
+      const entry=parseFloat(document.getElementById('rc-entry').value);
+      const stop=parseFloat(document.getElementById('rc-stop').value);
+      const out=document.getElementById('rc-out');
+      if(!isNaN(acc))localStorage.setItem('rc-account',acc);
+      if(!isNaN(pct))localStorage.setItem('rc-risk',pct);
+      if(isNaN(acc)||isNaN(pct)||isNaN(entry)||isNaN(stop)||entry===stop){
+        out.innerHTML='<span style="color:var(--muted)">מלא את 4 השדות (מחיר כניסה ≠ סטופ) לחישוב</span>';return;
+      }
+      const riskPerUnit=Math.abs(entry-stop);
+      const riskAmount=acc*(pct/100);
+      const units=riskAmount/riskPerUnit;
+      const posValue=units*entry;
+      out.innerHTML=`📦 כמות לקנייה: <b>${units<10?units.toFixed(2):Math.floor(units)}</b> יחידות &nbsp;·&nbsp; `+
+        `🛑 בסיכון: <b>${riskAmount.toFixed(2)}</b> &nbsp;·&nbsp; 💰 שווי פוזיציה: <b>${posValue.toFixed(2)}</b><br>`+
+        `<span style="color:var(--muted);font-size:13px">סיכון ליחידה: ${riskPerUnit.toFixed(4)}</span>`;
+    }
+
+    function calcHtml(ts){
+      const acc=localStorage.getItem('rc-account')||'';
+      const risk=localStorage.getItem('rc-risk')||'1';
+      const entry=(ts.entry_price!=null&&ts.entry_price!=='')?ts.entry_price:'';
+      const stop=(ts.stop_price!=null&&ts.stop_price!=='')?ts.stop_price:'';
+      return `<div class="card">
+        <h3>🧮 מחשבון סיכון וגודל פוזיציה</h3>
+        <div class="calc-grid">
+          <div><label>גודל חשבון</label><input type="number" id="rc-account" value="${esc(acc)}" oninput="calcRisk()" placeholder="10000"></div>
+          <div><label>סיכון לעסקה (%)</label><input type="number" id="rc-risk" value="${esc(risk)}" step="0.1" oninput="calcRisk()"></div>
+          <div><label>מחיר כניסה</label><input type="number" id="rc-entry" value="${esc(entry)}" step="any" oninput="calcRisk()"></div>
+          <div><label>מחיר סטופ</label><input type="number" id="rc-stop" value="${esc(stop)}" step="any" oninput="calcRisk()"></div>
+        </div>
+        <div class="calc-out" id="rc-out"></div>
+      </div>`;
+    }
+
+    /* ============ News + live price ============ */
+    function renderNews(nr){
+      if(!nr)return '';
+      if(nr.unavailable)return `<div class="card"><h3>📰 חדשות ודעת אנליסטים</h3><div class="summary-box" style="color:var(--muted)">לא זוהה סימול מהגרף. כדי לקבל חדשות, מחיר חי ודעת אנליסטים — כתוב את שם המניה/הסימול בשדה "סימול / הערות" ונתח שוב.</div></div>`;
+      if(nr.error)return `<div class="card"><h3>📰 חדשות ודעת אנליסטים</h3><div class="summary-box" style="color:var(--muted)">לא הצלחנו למשוך חדשות כרגע. נסה שוב מאוחר יותר.</div></div>`;
+      const r=String(nr.analyst_rating||'unknown').toLowerCase();
+      let cls='bias-neutral'; if(r.includes('buy'))cls='bias-long'; else if(r.includes('sell'))cls='bias-short';
+      const chg=String(nr.change_percent||''); const chgCls=chg.includes('-')?'chg-down':(chg&&chg!=='לא ידוע'?'chg-up':'');
+      const priceRow=(nr.current_price&&nr.current_price!=='לא ידוע')?
+        `<div class="price-row"><span class="price-now">${esc(nr.current_price)}</span><span class="${chgCls}" style="font-weight:700">${esc(nr.change_percent||'')}</span><span class="meta" style="color:var(--muted)">${esc(nr.company_name||'')}</span></div>`:'';
+      const warn=(nr.event_warning&&nr.event_warning.trim())?`<div class="warn">⚠️ ${esc(nr.event_warning)}</div>`:'';
+      const earn=(nr.next_earnings&&nr.next_earnings!=='לא ידוע')?`<div class="kv"><span class="k">דוח רווחים הבא:</span> <b>${esc(nr.next_earnings)}</b></div>`:'';
+      const news=(nr.news||[]).map(n=>{const s=n.sentiment||'neutral';const dot=s==='positive'?'🟢':s==='negative'?'🔴':'⚪';
+        return `<li>${dot} <b>${esc(n.title)}</b><br><span style="color:var(--muted);font-size:13px">${esc(n.summary)}</span></li>`;}).join('')||'<li style="color:var(--muted)">אין כותרות זמינות כרגע</li>';
+      return `<div class="card">
+        <h3>📰 חדשות, מחיר חי ודעת אנליסטים</h3>
+        ${priceRow}${warn}
+        <div class="bias-banner ${cls}" style="margin-bottom:12px">
+          <div><div class="conf">המלצת אנליסטים</div><div class="big">${esc(nr.rating_label||'לא ידוע')}</div></div>
+          <div style="text-align:left"><div class="conf">מחיר יעד</div><div class="big" style="font-size:18px">${esc(nr.price_target||'—')}</div></div>
+        </div>
+        ${earn}
+        <div class="kv"><div class="k">קונצנזוס אנליסטים</div><div class="summary-box">${esc(nr.consensus||'—')}</div></div>
+        <div class="k" style="margin-top:14px">כותרות אחרונות</div>
+        <ul class="clean" style="margin-top:6px">${news}</ul>
+      </div>`;
+    }
+
+    /* ============ Main render ============ */
+    function render(a){
+      const biasMap={long:['long','📈 לונג'],short:['short','📉 שורט'],neutral:['neutral','⚖️ נייטרלי']};
+      const [biasCls,biasLabel]=biasMap[a.overall_bias]||biasMap.neutral;
+      const t=a.trade_setup||{}, sm=a.smart_money||{};
+      const mtf=(a.multi_timeframe_note&&a.multi_timeframe_note.trim())?
+        `<div class="card"><h3>🔭 ניתוח רב-טווחי (Top-Down)</h3><div class="summary-box">${esc(a.multi_timeframe_note)}</div></div>`:'';
+      const liq=(a.liquidity_zones||[]).map(z=>`<li class="liq"><b>${esc(z.type)}</b> @ ${esc(z.price)} — <span style="color:var(--muted)">${esc(z.note)}</span></li>`).join('')||'<li style="color:var(--muted)">—</li>';
+
+      document.getElementById('results').innerHTML=`
+        <div class="bias-banner bias-${biasCls}">
+          <div><div class="big">${biasLabel}</div><div class="conf">${esc(a.symbol_guess)} · ${esc(a.timeframe)}</div></div>
+          <div style="text-align:left"><div class="conf">רמת ביטחון</div><div class="big">${esc(a.confidence)}%</div></div>
+        </div>
+        ${mtf}
         <div class="card">
           <h3>🎯 סטאפ מסחר</h3>
           <div class="grid">
@@ -308,56 +345,89 @@
               <div class="kv"><div class="k">סטופ לוס 🛑</div><div class="v">${esc(t.stop_loss)}</div></div>
             </div>
             <div>
-              <div class="kv"><div class="k">יעדי רווח 🎯</div>
-                <div class="tps">${(t.take_profits||[]).map(p=>`<span class="tp">${esc(p)}</span>`).join('') || '—'}</div></div>
+              <div class="kv"><div class="k">יעדי רווח 🎯</div><div class="tps">${(t.take_profits||[]).map(p=>`<span class="tp">${esc(p)}</span>`).join('')||'—'}</div></div>
               <div class="kv"><div class="k">יחס סיכוי/סיכון</div><div class="v">${esc(t.risk_reward)}</div></div>
             </div>
           </div>
         </div>
-
-        <div class="card">
-          <h3>🏗️ מבנה השוק</h3>
-          <div class="summary-box">${esc(a.market_structure)}</div>
-        </div>
-
+        ${calcHtml(t)}
+        <div class="card"><h3>🏗️ מבנה השוק</h3><div class="summary-box">${esc(a.market_structure)}</div></div>
         <div class="grid">
           <div class="card"><h3>🟢 תמיכות</h3><ul class="clean">${list(a.support_levels,'sup')}</ul></div>
           <div class="card"><h3>🔴 התנגדויות</h3><ul class="clean">${list(a.resistance_levels,'res')}</ul></div>
         </div>
-
-        <div class="card">
-          <h3>💧 אזורי נזילות (Liquidity)</h3>
-          <ul class="clean">${liq}</ul>
-        </div>
-
+        <div class="card"><h3>💧 אזורי נזילות</h3><ul class="clean">${liq}</ul></div>
         <div class="card">
           <h3>🐋 כסף חכם (Smart Money)</h3>
-          <div class="kv"><div class="k">איפה הכסף החכם נכנס / ייכנס</div>
-            <div class="summary-box">${esc(sm.where_smart_money_entering)}</div></div>
+          <div class="kv"><div class="k">איפה הכסף החכם נכנס / ייכנס</div><div class="summary-box">${esc(sm.where_smart_money_entering)}</div></div>
           <div class="grid" style="margin-top:12px">
             <div><div class="k">Order Blocks</div><ul class="clean">${list(sm.order_blocks,'liq')}</ul></div>
-            <div><div class="k">Fair Value Gaps (FVG)</div><ul class="clean">${list(sm.fair_value_gaps,'liq')}</ul></div>
+            <div><div class="k">Fair Value Gaps</div><ul class="clean">${list(sm.fair_value_gaps,'liq')}</ul></div>
           </div>
-          <div class="kv" style="margin-top:12px"><div class="k">צבירה / חלוקה</div>
-            <div class="v">${esc(sm.accumulation_distribution)}</div></div>
+          <div class="kv" style="margin-top:12px"><div class="k">צבירה / חלוקה</div><div class="v">${esc(sm.accumulation_distribution)}</div></div>
         </div>
-
         <div class="card">
-          <h3>🔍 תצפיות מפתח</h3>
-          <ul class="clean">${list(a.key_observations)}</ul>
-          <div class="kv" style="margin-top:12px"><div class="k">ביטול הניתוח (Invalidation)</div>
-            <div class="v">${esc(a.invalidation)}</div></div>
+          <h3>🔍 תצפיות מפתח</h3><ul class="clean">${list(a.key_observations)}</ul>
+          <div class="kv" style="margin-top:12px"><div class="k">ביטול הניתוח</div><div class="v">${esc(a.invalidation)}</div></div>
         </div>
-
-        <div class="card">
-          <h3>📝 סיכום</h3>
-          <div class="summary-box">${esc(a.summary)}</div>
-        </div>
-
+        <div class="card"><h3>📝 סיכום</h3><div class="summary-box">${esc(a.summary)}</div></div>
         ${renderNews(a.news_report)}
+        <button class="save-btn" onclick="addToJournal()">💾 שמור ניתוח ליומן המסחר</button>
       `;
-      results.classList.add('show');
-      results.scrollIntoView({ behavior: 'smooth' });
+      document.getElementById('results').classList.add('show');
+      calcRisk();
+      document.getElementById('results').scrollIntoView({behavior:'smooth'});
+    }
+
+    /* ============ Journal (localStorage) ============ */
+    function getJournal(){try{return JSON.parse(localStorage.getItem('journal')||'[]');}catch(e){return [];}}
+    function saveJournal(j){localStorage.setItem('journal',JSON.stringify(j));}
+    function addToJournal(){
+      if(!lastAnalysis)return;
+      const a=lastAnalysis,t=a.trade_setup||{};
+      const rec={id:Date.now(),date:new Date().toLocaleDateString('he-IL'),
+        symbol:a.symbol_guess||'—',timeframe:a.timeframe||'',bias:a.overall_bias||'neutral',
+        entry:t.entry_zone||'',stop:t.stop_loss||'',tps:(t.take_profits||[]).join(' · '),outcome:'open'};
+      const j=getJournal(); j.unshift(rec); saveJournal(j);
+      const b=event.target; b.textContent='✅ נשמר ליומן!'; b.disabled=true;
+      setTimeout(()=>{b.textContent='💾 שמור ניתוח ליומן המסחר';b.disabled=false;},2000);
+    }
+    function setOutcome(id,oc){const j=getJournal();const r=j.find(x=>x.id===id);if(r){r.outcome=oc;saveJournal(j);renderJournal();}}
+    function delRec(id){if(!confirm('למחוק רישום זה?'))return;saveJournal(getJournal().filter(x=>x.id!==id));renderJournal();}
+
+    function renderJournal(){
+      const j=getJournal();
+      const closed=j.filter(r=>r.outcome!=='open');
+      const wins=closed.filter(r=>r.outcome==='win').length;
+      const wr=closed.length?Math.round(wins/closed.length*100):0;
+      const biasMap={long:'📈',short:'📉',neutral:'⚖️'};
+      const pillMap={open:['p-open','פתוח'],win:['p-win','✅ רווח'],loss:['p-loss','❌ הפסד'],be:['p-be','⚪ סגירה']};
+      const recs=j.map(r=>{const[pc,pl]=pillMap[r.outcome]||pillMap.open;return `
+        <div class="jrec">
+          <div class="h"><div><span class="sym">${biasMap[r.bias]||''} ${esc(r.symbol)}</span> <span class="pill ${pc}">${pl}</span></div>
+            <div class="meta">${esc(r.date)} · ${esc(r.timeframe)}</div></div>
+          <div class="meta" style="margin-top:6px">כניסה: ${esc(r.entry)||'—'} · סטופ: ${esc(r.stop)||'—'}${r.tps?' · יעדים: '+esc(r.tps):''}</div>
+          <div class="acts">
+            <button onclick="setOutcome(${r.id},'win')">✅ רווח</button>
+            <button onclick="setOutcome(${r.id},'loss')">❌ הפסד</button>
+            <button onclick="setOutcome(${r.id},'be')">⚪ סגירה</button>
+            <button onclick="delRec(${r.id})" style="flex:0;color:var(--red)">🗑️</button>
+          </div>
+        </div>`;}).join('')||'<div class="summary-box" style="color:var(--muted)">עדיין אין רישומים. נתח גרף ולחץ "שמור ליומן".</div>';
+      document.getElementById('journal').innerHTML=`
+        <div class="stat-row">
+          <div class="stat"><div class="n">${j.length}</div><div class="l">סה״כ ניתוחים</div></div>
+          <div class="stat"><div class="n">${closed.length}</div><div class="l">עסקאות סגורות</div></div>
+          <div class="stat"><div class="n" style="color:var(--green)">${wr}%</div><div class="l">אחוז הצלחה</div></div>
+        </div>${recs}`;
+    }
+
+    function showView(v){
+      const an=document.getElementById('view-analyze'), jo=document.getElementById('journal');
+      document.getElementById('tab-analyze').classList.toggle('active',v==='analyze');
+      document.getElementById('tab-journal').classList.toggle('active',v==='journal');
+      if(v==='journal'){an.style.display='none';jo.classList.add('show');jo.style.display='block';renderJournal();}
+      else{an.style.display='block';jo.classList.remove('show');jo.style.display='none';}
     }
   </script>
 </body>

@@ -1,9 +1,9 @@
 """
 Chart Analyzer — ניתוח גרפים חכם באמצעות Google Gemini (Vision).
 
-מעלים תמונת גרף (דקתי / 5 דקות / שעתי / יומי / שבועי) ומקבלים ניתוח מסחר מלא:
-המלצות כניסה ויציאה (לונג/שורט), אזורי נזילות, תמיכה והתנגדות,
-איפה הכסף החכם (Smart Money) נכנס/ייכנס, ועוד.
+מעלים תמונת גרף (או כמה טווחי זמן יחד) ומקבלים ניתוח מסחר מלא:
+המלצות כניסה/יציאה (לונג/שורט), נזילות, תמיכה/התנגדות, כסף חכם,
+מחיר חי, חדשות ודעת אנליסטים, ומחירים מספריים למחשבון סיכון.
 
 משתמש ב-Gemini עם שכבה חינמית. מפתח חינמי: https://aistudio.google.com/apikey
 """
@@ -21,10 +21,8 @@ load_dotenv()
 
 app = Flask(__name__)
 
-# מודל Gemini עם תמיכה בתמונות ושכבה חינמית
 MODEL = "gemini-2.0-flash"
 
-# סוגי תמונה נתמכים (mime type)
 SUPPORTED_MEDIA = {
     "image/jpeg": "image/jpeg",
     "image/jpg": "image/jpeg",
@@ -33,7 +31,6 @@ SUPPORTED_MEDIA = {
     "image/webp": "image/webp",
 }
 
-# תוויות טווחי זמן לתצוגה אנושית בתוך הפרומפט
 TIMEFRAME_LABELS = {
     "1m": "דקה (1m)",
     "5m": "5 דקות (5m)",
@@ -44,17 +41,19 @@ TIMEFRAME_LABELS = {
     "1w": "שבועי (1W)",
 }
 
-# מבנה ה-JSON שהמודל חייב להחזיר (המפתחות חייבים להתאים ל-index.html)
 JSON_SHAPE = """{
   "symbol_guess": "ניחוש הסימול/נכס אם נראה בתמונה, אחרת 'לא ידוע'",
-  "timeframe": "טווח הזמן שנותח",
+  "timeframe": "טווח/י הזמן שנותחו",
   "market_structure": "תיאור מבנה השוק (עלייה/ירידה/דשדוש, BOS, CHoCH)",
   "overall_bias": "long | short | neutral",
   "confidence": 0,
+  "multi_timeframe_note": "אם נותחו כמה טווחי זמן — סיכום קצר של ההתאמה ביניהם (Top-Down). אחרת ''",
   "trade_setup": {
     "direction": "long | short | none",
-    "entry_zone": "אזור כניסה",
-    "stop_loss": "סטופ לוס",
+    "entry_zone": "תיאור אזור כניסה",
+    "entry_price": null,
+    "stop_loss": "תיאור סטופ לוס",
+    "stop_price": null,
     "take_profits": ["יעד 1", "יעד 2"],
     "risk_reward": "יחס סיכוי/סיכון"
   },
@@ -77,6 +76,9 @@ JSON_SHAPE = """{
 SYSTEM_PROMPT = f"""אתה אנליסט מסחר מומחה (Price Action + Smart Money Concepts / ICT).
 אתה מנתח צילומי מסך של גרפים פיננסיים (מניות, קריפטו, פורקס, מדדים).
 
+אם קיבלת כמה גרפים של טווחי זמן שונים — בצע ניתוח Top-Down משולב:
+הטווח הגבוה קובע את הכיוון הכללי, והנמוך את נקודת הכניסה המדויקת.
+
 עבור כל גרף נתח לעומק: מבנה השוק, כיוון מועדף (לונג/שורט/נייטרלי) עם רמת ביטחון,
 סטאפ מסחר (כניסה, סטופ, יעדי רווח, יחס סיכוי/סיכון), תמיכות והתנגדויות,
 אזורי נזילות (Buy/Sell-side, Equal Highs/Lows, צפי ל-Liquidity Sweep),
@@ -84,6 +86,7 @@ SYSTEM_PROMPT = f"""אתה אנליסט מסחר מומחה (Price Action + Smar
 
 כללים:
 - כל המחירים והרמות נגזרים ממה שאתה רואה בפועל בגרף. אם רמה לא ברורה — ציין זאת.
+- החזר את entry_price ו-stop_price כ*מספרים* (לא מחרוזת) אם ניתן לקרוא אותם מהגרף, אחרת null.
 - אם אינך מזהה סימול/מחירים, תן ניתוח טכני יחסי ואל תמציא מספרים.
 - ענה תמיד בעברית, מקצועי וברור. זהו ניתוח חינוכי בלבד, לא ייעוץ השקעות.
 
@@ -92,7 +95,6 @@ SYSTEM_PROMPT = f"""אתה אנליסט מסחר מומחה (Price Action + Smar
 
 
 def get_client():
-    """יוצר client של Gemini. מחזיר None אם אין מפתח API."""
     api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
     if not api_key:
         return None
@@ -100,7 +102,6 @@ def get_client():
 
 
 def _strip_json_fence(text):
-    """מנקה גידור קוד ```json אם המודל הוסיף אותו."""
     text = (text or "").strip()
     if text.startswith("```"):
         text = text.strip("`")
@@ -110,22 +111,25 @@ def _strip_json_fence(text):
 
 
 def fetch_market_news(client, symbol):
-    """מחפש באינטרנט חדשות ודעת אנליסטים על הנכס, באמצעות Google Search grounding."""
+    """חדשות, דעת אנליסטים, מחיר חי ואירועים קרובים — דרך Google Search grounding."""
     prompt = (
-        f'חפש באינטרנט מידע עדכני (מהחודשים האחרונים) על הנכס/מניה: "{symbol}".\n'
+        f'חפש באינטרנט מידע עדכני (מהימים/שבועות האחרונים) על הנכס/מניה: "{symbol}".\n'
         "החזר אך ורק אובייקט JSON תקין (ללא טקסט נוסף, ללא גידור קוד), במבנה הבא:\n"
         "{\n"
         '  "company_name": "שם החברה/הנכס",\n'
+        '  "current_price": "מחיר נוכחי כולל מטבע, אחרת \'לא ידוע\'",\n'
+        '  "change_percent": "שינוי יומי באחוזים (למשל +1.8%), אחרת \'לא ידוע\'",\n'
         '  "analyst_rating": "strong_buy | buy | hold | sell | strong_sell | unknown",\n'
         '  "rating_label": "תווית בעברית: קנייה חזקה / קנייה / החזק / מכירה / מכירה חזקה / לא ידוע",\n'
         '  "consensus": "משפט-שניים על קונצנזוס האנליסטים בעברית",\n'
         '  "price_target": "מחיר יעד ממוצע אם קיים, אחרת \'לא ידוע\'",\n'
+        '  "next_earnings": "תאריך דוח הרווחים הבא אם ידוע, אחרת \'לא ידוע\'",\n'
+        '  "event_warning": "אזהרה קצרה בעברית אם יש אירוע משמעותי קרוב (דוח/החלטת ריבית/אירוע מאקרו), אחרת \'\'",\n'
         '  "news": [\n'
         '    {"title": "כותרת בעברית", "summary": "תקציר קצר בעברית", "sentiment": "positive | negative | neutral"}\n'
         "  ]\n"
         "}\n"
-        "כלול עד 5 כותרות חדשות רלוונטיות ועדכניות. אם אין מספיק מידע, החזר "
-        "rating_label='לא ידוע' ורשימת news ריקה. אל תמציא נתונים."
+        "כלול עד 5 כותרות עדכניות ורלוונטיות. אם אין מספיק מידע — החזר 'לא ידוע' ורשימת news ריקה. אל תמציא נתונים."
     )
     resp = client.models.generate_content(
         model="gemini-2.5-flash",
@@ -145,7 +149,6 @@ def index():
 
 @app.route("/health")
 def health():
-    """נקודת בדיקה קלה — משמשת שירות keep-alive כדי שהשרת לא יירדם."""
     return "ok", 200
 
 
@@ -157,45 +160,63 @@ def analyze():
             "error": "לא הוגדר מפתח API. הגדר GEMINI_API_KEY (מפתח חינמי: https://aistudio.google.com/apikey)."
         }), 500
 
-    if "image" not in request.files:
+    # תמיכה בכמה תמונות (ניתוח רב-טווחי) + תאימות לאחור לשדה image בודד
+    files = request.files.getlist("images")
+    if not files and "image" in request.files:
+        files = [request.files["image"]]
+    files = [f for f in files if f and f.filename]
+    if not files:
         return jsonify({"error": "לא נשלחה תמונה."}), 400
+    if len(files) > 3:
+        files = files[:3]
 
-    file = request.files["image"]
-    raw = file.read()
-    if not raw:
-        return jsonify({"error": "הקובץ ריק."}), 400
-
-    media_type = SUPPORTED_MEDIA.get((file.mimetype or "").lower())
-    if media_type is None:
-        return jsonify({
-            "error": "סוג קובץ לא נתמך. השתמש ב-PNG, JPG, GIF או WEBP."
-        }), 400
-
-    timeframe = request.form.get("timeframe", "1h")
-    tf_label = TIMEFRAME_LABELS.get(timeframe, timeframe)
+    timeframes = request.form.getlist("timeframes")
+    if not timeframes:
+        timeframes = [request.form.get("timeframe", "1h")]
     notes = (request.form.get("notes") or "").strip()
 
-    user_text = (
-        f"לפניך צילום מסך של גרף בטווח זמן: {tf_label}.\n"
-        "נתח אותו לעומק והחזר את כל המידע במבנה ה-JSON שהוגדר."
-    )
+    image_parts = []
+    tf_labels = []
+    for i, f in enumerate(files):
+        raw = f.read()
+        if not raw:
+            continue
+        media_type = SUPPORTED_MEDIA.get((f.mimetype or "").lower())
+        if media_type is None:
+            return jsonify({"error": "סוג קובץ לא נתמך. השתמש ב-PNG, JPG, GIF או WEBP."}), 400
+        tf = timeframes[i] if i < len(timeframes) else "1h"
+        tf_labels.append(TIMEFRAME_LABELS.get(tf, tf))
+        image_parts.append(types.Part.from_bytes(data=raw, mime_type=media_type))
+
+    if not image_parts:
+        return jsonify({"error": "הקובץ ריק."}), 400
+
+    if len(image_parts) == 1:
+        user_text = (
+            f"לפניך צילום מסך של גרף בטווח זמן: {tf_labels[0]}.\n"
+            "נתח אותו לעומק והחזר את כל המידע במבנה ה-JSON שהוגדר."
+        )
+    else:
+        joined = ", ".join(tf_labels)
+        user_text = (
+            f"לפניך {len(image_parts)} גרפים של אותו נכס בטווחי זמן (לפי הסדר): {joined}.\n"
+            "בצע ניתוח Top-Down משולב: הטווח הגבוה לכיוון, הנמוך לכניסה. "
+            "מלא את multi_timeframe_note והחזר את כל המידע במבנה ה-JSON שהוגדר."
+        )
     if notes:
         user_text += f"\n\nהקשר נוסף מהמשתמש: {notes}"
 
-    # רשימת מודלים לנסות לפי הסדר (אם הראשון חוסם במכסה — ננסה את הבא)
+    contents = image_parts + [user_text]
+
     models_to_try = [MODEL, "gemini-2.5-flash", "gemini-flash-latest"]
     response = None
     last_msg = ""
-
     for model_name in models_to_try:
-        for attempt in range(2):  # ניסיון + ניסיון חוזר אחד עם המתנה
+        for attempt in range(2):
             try:
                 response = client.models.generate_content(
                     model=model_name,
-                    contents=[
-                        types.Part.from_bytes(data=raw, mime_type=media_type),
-                        user_text,
-                    ],
+                    contents=contents,
                     config=types.GenerateContentConfig(
                         system_instruction=SYSTEM_PROMPT,
                         response_mime_type="application/json",
@@ -209,14 +230,14 @@ def analyze():
                 if is_rate and attempt == 0:
                     time.sleep(4)
                     continue
-                break  # שגיאה שאינה ניתנת לניסיון חוזר, או שכבר ניסינו — עבור למודל הבא
+                break
         if response is not None:
             break
 
     if response is None:
         msg = last_msg
         low = msg.lower()
-        if "api key" in low or "api_key" in low or "permission" in low or "invalid" in low and "key" in low:
+        if "api key" in low or "api_key" in low or "permission" in low:
             return jsonify({"error": f"בעיית מפתח API. פרטים: {msg[:200]}"}), 502
         if "RESOURCE_EXHAUSTED" in msg or "429" in msg or "quota" in low:
             return jsonify({"error": f"חרגת ממכסת השימוש החינמית. פרטים: {msg[:220]}"}), 429
@@ -231,7 +252,7 @@ def analyze():
     except json.JSONDecodeError:
         return jsonify({"error": "תקלה בפענוח התשובה.", "raw": text[:500]}), 502
 
-    # שלב שני: חדשות ודעת אנליסטים (חיפוש באינטרנט) על הסימול שזוהה
+    # שלב שני: חדשות, מחיר חי, אנליסטים ואירועים
     symbol = (data.get("symbol_guess") or "").strip()
     known = bool(symbol) and symbol.lower() not in ("לא ידוע", "unknown", "n/a", "none")
     if not known and notes:
@@ -240,7 +261,7 @@ def analyze():
     if known:
         try:
             data["news_report"] = fetch_market_news(client, symbol)
-        except Exception as e:  # noqa: BLE001 — החדשות הן תוספת; לא מפילות את הניתוח
+        except Exception as e:  # noqa: BLE001
             data["news_report"] = {"error": str(e)[:160]}
     else:
         data["news_report"] = {"unavailable": True}
