@@ -3,417 +3,447 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#0b0f1a">
-<title>כדאי? — לפני שאתה משלם</title>
+<meta name="theme-color" content="#080b12">
+<title>אוצר · הבנק הפרטי שלך</title>
 <style>
   :root{
-    --bg:#0b0f1a; --card:#151b2e; --card2:#1c2440; --line:#26304f;
-    --txt:#eef2ff; --sub:#93a0c4; --accent:#5b8cff; --accent2:#7c5bff;
-    --green:#25d47b; --amber:#ffb531; --red:#ff5d6c;
-    --shadow:0 18px 50px rgba(0,0,0,.55);
+    --bg:#080b12; --panel:#0f1420; --panel2:#141a29; --line:#1f2740;
+    --txt:#f3f1ea; --sub:#8b93a9;
+    --gold:#c9a86a; --gold2:#e7d6ac; --goldsoft:rgba(201,168,106,.14);
+    --green:#5ec98a; --amber:#e0b458; --red:#e07070;
+    --serif:"Georgia","Times New Roman",serif;
+    --shadow:0 24px 60px rgba(0,0,0,.6);
   }
-  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{margin:0;height:100%}
   body{
-    font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
-    background:radial-gradient(1200px 700px at 70% -10%,#1a2547 0%,#0b0f1a 55%);
-    color:var(--txt); display:flex; align-items:center; justify-content:center;
-    min-height:100vh; padding:18px;
+    font-family:"Segoe UI",system-ui,-apple-system,Arial,sans-serif;
+    background:radial-gradient(1100px 620px at 75% -12%,#151d33 0%,#080b12 58%);
+    color:var(--txt);display:flex;align-items:center;justify-content:center;min-height:100vh;padding:18px;
   }
-  /* phone frame */
-  .phone{
-    width:390px; max-width:100%; height:min(844px,94vh);
-    background:var(--bg); border-radius:42px; position:relative; overflow:hidden;
-    box-shadow:var(--shadow),0 0 0 10px #05070d,0 0 0 12px #1b2340;
-    display:flex; flex-direction:column;
-  }
-  .notch{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:130px;height:26px;background:#05070d;border-radius:16px;z-index:40}
-  .screen{flex:1;overflow-y:auto;overflow-x:hidden;padding:54px 18px 92px;scrollbar-width:none}
+  .phone{width:390px;max-width:100%;height:min(844px,95vh);background:var(--bg);border-radius:44px;position:relative;
+    overflow:hidden;box-shadow:var(--shadow),0 0 0 10px #04060a,0 0 0 12px #171f34;display:flex;flex-direction:column}
+  .notch{position:absolute;top:11px;left:50%;transform:translateX(-50%);width:120px;height:24px;background:#04060a;border-radius:14px;z-index:40}
+  .screen{flex:1;overflow-y:auto;overflow-x:hidden;padding:52px 18px 96px;scrollbar-width:none}
   .screen::-webkit-scrollbar{display:none}
 
-  .brandrow{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-  .brand{display:flex;align-items:center;gap:9px;font-weight:800;font-size:20px;letter-spacing:.5px}
-  .logo{width:34px;height:34px;border-radius:11px;background:linear-gradient(135deg,var(--accent),var(--accent2));
-    display:grid;place-items:center;font-size:19px;box-shadow:0 6px 18px rgba(91,140,255,.5)}
-  .avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#ffb531,#ff5d6c);display:grid;place-items:center;font-weight:700}
+  /* header */
+  .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+  .brand{display:flex;align-items:center;gap:11px}
+  .mono{width:40px;height:40px;border-radius:12px;background:linear-gradient(150deg,#1c2338,#0d1220);
+    border:1px solid rgba(201,168,106,.4);display:grid;place-items:center;position:relative}
+  .mono b{font-family:var(--serif);color:var(--gold2);font-size:22px;line-height:1}
+  .brand .name{font-family:var(--serif);font-size:22px;letter-spacing:.5px}
+  .brand .name span{color:var(--gold)}
+  .tagline{font-size:9.5px;letter-spacing:3px;color:var(--sub);text-transform:uppercase;margin-top:1px}
+  .avatar{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:linear-gradient(150deg,#232c46,#12172a);
+    display:grid;place-items:center;font-family:var(--serif);color:var(--gold2)}
 
-  .card{background:linear-gradient(160deg,var(--card),var(--card2));border:1px solid var(--line);border-radius:22px;padding:18px;margin-bottom:14px}
-  .balance .lbl{color:var(--sub);font-size:13px;margin-bottom:4px}
-  .balance .big{font-size:38px;font-weight:800;letter-spacing:-1px}
-  .balance .big small{font-size:20px;color:var(--sub);font-weight:600}
-  .avail{display:flex;gap:10px;margin-top:14px}
-  .pill{flex:1;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:14px;padding:10px 12px}
-  .pill .k{color:var(--sub);font-size:11px}
-  .pill .v{font-size:17px;font-weight:800;margin-top:2px}
-  .pill.green .v{color:var(--green)} .pill.amber .v{color:var(--amber)}
+  .card{background:linear-gradient(165deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:20px;padding:18px;margin-bottom:14px}
+  .hairline{height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent);margin:14px 0}
 
-  .hero{background:linear-gradient(150deg,#1d2a55,#221c4d);border:1px solid #34407a;text-align:center}
-  .hero h2{margin:2px 0 3px;font-size:19px}
-  .hero p{margin:0 0 14px;color:var(--sub);font-size:13px}
-  .ask{display:flex;gap:8px}
-  .ask input[type=text]{flex:1;background:#0e1428;border:1px solid var(--line);border-radius:14px;color:var(--txt);
-    padding:14px 14px;font-size:16px;outline:none;font-family:inherit}
-  .ask input::placeholder{color:#5f6d94}
-  .amt{position:relative;flex:1.1}
-  .amt input{width:100%;background:#0e1428;border:1px solid var(--line);border-radius:14px;color:var(--txt);
-    padding:14px 34px 14px 14px;font-size:18px;font-weight:800;outline:none;font-family:inherit}
-  .amt span{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--sub);font-weight:800}
-  .btn{border:0;border-radius:14px;padding:15px;font-size:16px;font-weight:800;font-family:inherit;cursor:pointer;color:#fff;
-    background:linear-gradient(135deg,var(--accent),var(--accent2));width:100%;margin-top:12px;box-shadow:0 10px 24px rgba(91,140,255,.35)}
-  .btn:active{transform:scale(.98)}
-  .btn.ghost{background:rgba(255,255,255,.06);border:1px solid var(--line);box-shadow:none}
-  .btn.pay{background:linear-gradient(135deg,#25d47b,#12a45c)}
-  .btn:disabled{opacity:.5}
+  /* net worth */
+  .worth .eyebrow{display:flex;align-items:center;gap:7px;color:var(--sub);font-size:11px;letter-spacing:2px;text-transform:uppercase}
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--gold);box-shadow:0 0 8px var(--gold)}
+  .worth .big{font-family:var(--serif);font-size:44px;letter-spacing:-.5px;margin:8px 0 2px;color:var(--gold2)}
+  .worth .big small{font-size:22px;color:var(--sub)}
+  .trend{font-size:12.5px;color:var(--green)}
+  .trend .down{color:var(--red)}
+  .spark{width:100%;height:44px;margin-top:6px;display:block}
+  .breakdown{display:flex;gap:9px;margin-top:16px}
+  .bd{flex:1;background:rgba(255,255,255,.025);border:1px solid var(--line);border-radius:13px;padding:11px 12px}
+  .bd .k{color:var(--sub);font-size:10.5px;letter-spacing:.5px}
+  .bd .v{font-family:var(--serif);font-size:17px;margin-top:4px}
+  .bd .v.pos{color:var(--green)} .bd .v.neg{color:var(--red)}
 
-  .quick{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;justify-content:center}
-  .chip{background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:999px;padding:8px 13px;font-size:13px;cursor:pointer;color:var(--sub)}
-  .chip:active{background:rgba(255,255,255,.12)}
+  .sec-head{display:flex;align-items:center;justify-content:space-between;margin:4px 2px 11px}
+  .sec-head h3{margin:0;font-family:var(--serif);font-size:16px;font-weight:400;letter-spacing:.3px}
+  .sec-head a{color:var(--gold);font-size:12px;text-decoration:none}
+
+  /* asset rows */
+  .arow{display:flex;align-items:center;gap:13px;padding:13px 0;border-top:1px solid rgba(255,255,255,.05)}
+  .arow:first-child{border-top:0}
+  .aicon{width:42px;height:42px;border-radius:12px;flex:0 0 auto;display:grid;place-items:center;background:rgba(255,255,255,.04);border:1px solid var(--line)}
+  .aicon svg{width:21px;height:21px;stroke:var(--gold2);fill:none;stroke-width:1.6}
+  .aname{font-size:14.5px;font-weight:600}
+  .ameta{color:var(--sub);font-size:11.5px;margin-top:2px}
+  .aval{margin-inline-start:auto;text-align:end}
+  .aval .n{font-family:var(--serif);font-size:15.5px}
+  .aval .n.neg{color:var(--red)}
+  .aval .s{color:var(--sub);font-size:10.5px;margin-top:2px}
+
+  .tags{display:flex;gap:7px;overflow-x:auto;margin:0 -18px 0;padding:0 18px 2px;scrollbar-width:none}
+  .tags::-webkit-scrollbar{display:none}
+  .tag{white-space:nowrap;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-size:12.5px;color:var(--sub);cursor:pointer}
+  .tag.on{background:var(--goldsoft);border-color:rgba(201,168,106,.5);color:var(--gold2)}
+
+  /* consult module */
+  .consult .eyebrow{color:var(--sub);font-size:11px;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
+  .consult h2{font-family:var(--serif);font-size:19px;font-weight:400;margin:0 0 3px}
+  .consult p{margin:0 0 14px;color:var(--sub);font-size:12.5px;line-height:1.5}
+  .field{display:flex;gap:8px;margin-bottom:9px}
+  .field input{flex:1;background:#0a0e17;border:1px solid var(--line);border-radius:12px;color:var(--txt);padding:13px 14px;font-size:15px;outline:none;font-family:inherit}
+  .field input:focus{border-color:rgba(201,168,106,.5)}
+  .field input::placeholder{color:#59627b}
+  .amt{position:relative;flex:1.05}
+  .amt input{width:100%;padding-inline-start:30px;font-family:var(--serif);font-size:17px}
+  .amt span{position:absolute;right:13px;top:50%;transform:translateY(-50%);color:var(--sub)}
+  .btn{border:0;border-radius:12px;padding:14px;font-size:14.5px;font-weight:700;font-family:inherit;cursor:pointer;width:100%;
+    background:linear-gradient(135deg,var(--gold),#a9884d);color:#161206;letter-spacing:.3px}
+  .btn:active{transform:scale(.985)}
+  .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--txt);font-weight:600}
+  .btn.pay{background:linear-gradient(135deg,var(--gold2),var(--gold));color:#171205}
+  .quick{display:flex;gap:7px;flex-wrap:wrap;margin-top:11px}
+  .qchip{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:12px;color:var(--sub);cursor:pointer}
+  .qchip:active{background:var(--goldsoft)}
 
   /* verdict */
-  .verdict{border-radius:22px;padding:20px;margin-bottom:14px;border:1px solid;animation:pop .35s ease}
-  @keyframes pop{from{transform:scale(.92);opacity:0}to{transform:scale(1);opacity:1}}
-  .verdict.yes{background:linear-gradient(150deg,rgba(37,212,123,.16),rgba(37,212,123,.04));border-color:rgba(37,212,123,.5)}
-  .verdict.maybe{background:linear-gradient(150deg,rgba(255,181,49,.16),rgba(255,181,49,.04));border-color:rgba(255,181,49,.5)}
-  .verdict.no{background:linear-gradient(150deg,rgba(255,93,108,.16),rgba(255,93,108,.04));border-color:rgba(255,93,108,.5)}
-  .verdict .head{display:flex;align-items:center;gap:12px}
-  .vicon{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;font-size:28px;flex:0 0 auto}
-  .yes .vicon{background:rgba(37,212,123,.2)} .maybe .vicon{background:rgba(255,181,49,.2)} .no .vicon{background:rgba(255,93,108,.2)}
-  .verdict .ttl{font-size:22px;font-weight:800}
-  .yes .ttl{color:var(--green)} .maybe .ttl{color:var(--amber)} .no .ttl{color:var(--red)}
-  .verdict .amtline{color:var(--sub);font-size:13px;margin-top:2px}
-  .reasons{list-style:none;padding:0;margin:15px 0 0}
-  .reasons li{display:flex;gap:9px;align-items:flex-start;padding:8px 0;border-top:1px solid rgba(255,255,255,.06);font-size:14px;line-height:1.4}
+  .verdict{border-radius:18px;padding:18px;margin-top:14px;border:1px solid;animation:pop .35s ease}
+  @keyframes pop{from{transform:translateY(8px);opacity:0}to{transform:none;opacity:1}}
+  .verdict.yes{border-color:rgba(94,201,138,.4);background:linear-gradient(160deg,rgba(94,201,138,.1),transparent)}
+  .verdict.maybe{border-color:rgba(224,180,88,.4);background:linear-gradient(160deg,rgba(224,180,88,.1),transparent)}
+  .verdict.no{border-color:rgba(224,112,112,.4);background:linear-gradient(160deg,rgba(224,112,112,.1),transparent)}
+  .vhead{display:flex;align-items:center;gap:12px}
+  .vbadge{font-size:10.5px;letter-spacing:2px;text-transform:uppercase;padding:4px 10px;border-radius:999px}
+  .yes .vbadge{background:rgba(94,201,138,.16);color:var(--green)}
+  .maybe .vbadge{background:rgba(224,180,88,.16);color:var(--amber)}
+  .no .vbadge{background:rgba(224,112,112,.16);color:var(--red)}
+  .vttl{font-family:var(--serif);font-size:19px;margin-top:9px}
+  .vsub{color:var(--sub);font-size:12px;margin-top:2px}
+  .reasons{list-style:none;padding:0;margin:14px 0 0}
+  .reasons li{display:flex;gap:10px;padding:9px 0;border-top:1px solid rgba(255,255,255,.05);font-size:13px;line-height:1.45;color:#d7dbe6}
   .reasons li:first-child{border-top:0}
-  .reasons .ri{flex:0 0 auto;font-size:16px}
+  .reasons .m{width:5px;height:5px;border-radius:50%;background:var(--gold);margin-top:7px;flex:0 0 auto}
 
-  .sub-list{list-style:none;padding:0;margin:0}
-  .sub-item{display:flex;align-items:center;gap:12px;padding:13px 0;border-top:1px solid rgba(255,255,255,.06)}
-  .sub-item:first-child{border-top:0}
-  .sub-ic{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-size:20px;background:rgba(255,255,255,.06);flex:0 0 auto}
-  .sub-name{font-weight:700}.sub-meta{color:var(--sub);font-size:12px;margin-top:2px}
-  .sub-price{font-weight:800;margin-inline-start:auto;text-align:end}
-  .flag{font-size:11px;color:var(--amber);background:rgba(255,181,49,.12);padding:2px 7px;border-radius:8px;display:inline-block;margin-top:3px}
-  .kill{background:rgba(255,93,108,.14);color:var(--red);border:1px solid rgba(255,93,108,.4);border-radius:10px;padding:7px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
+  /* chat / banker */
+  .banker-head{display:flex;align-items:center;gap:13px;margin-bottom:4px}
+  .banker-av{width:46px;height:46px;border-radius:50%;background:linear-gradient(150deg,#2a3350,#141a2c);border:1px solid rgba(201,168,106,.4);display:grid;place-items:center;font-family:var(--serif);color:var(--gold2);font-size:20px}
+  .chat{display:flex;flex-direction:column;gap:9px;margin-top:6px}
+  .msg{max-width:84%;padding:11px 14px;border-radius:15px;font-size:13.5px;line-height:1.5}
+  .msg.bot{background:var(--panel2);border:1px solid var(--line);border-end-start-radius:4px;align-self:flex-start;color:#e2e5ee}
+  .msg.me{background:linear-gradient(135deg,var(--gold),#a9884d);color:#171205;border-end-end-radius:4px;align-self:flex-end}
 
-  .chat{display:flex;flex-direction:column;gap:10px}
-  .msg{max-width:82%;padding:11px 14px;border-radius:16px;font-size:14px;line-height:1.45}
-  .msg.bot{background:var(--card2);border:1px solid var(--line);border-end-start-radius:5px;align-self:flex-start}
-  .msg.me{background:linear-gradient(135deg,var(--accent),var(--accent2));border-end-end-radius:5px;align-self:flex-end;color:#fff}
+  .muted{color:var(--sub);font-size:12.5px;line-height:1.55}
+  .flag{font-size:10.5px;color:var(--amber);background:rgba(224,180,88,.1);padding:2px 8px;border-radius:7px;display:inline-block;margin-top:4px}
+  .kill{background:transparent;color:var(--red);border:1px solid rgba(224,112,112,.4);border-radius:9px;padding:6px 11px;font-size:11.5px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:5px}
 
-  .sec-title{font-size:15px;font-weight:800;margin:6px 2px 10px;display:flex;align-items:center;gap:8px}
-  .muted{color:var(--sub);font-size:13px;line-height:1.5}
+  .progress{height:8px;background:#0a0e17;border-radius:6px;overflow:hidden;border:1px solid var(--line)}
+  .progress > div{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2))}
 
-  /* bottom nav */
-  .nav{position:absolute;bottom:0;left:0;right:0;height:74px;background:rgba(11,15,26,.86);backdrop-filter:blur(14px);
-    border-top:1px solid var(--line);display:flex;z-index:30}
-  .nav button{flex:1;background:none;border:0;color:var(--sub);font-family:inherit;font-size:11px;display:flex;
-    flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;padding-bottom:8px}
-  .nav button .ni{font-size:21px}
-  .nav button.on{color:var(--accent)}
-
+  /* nav */
+  .nav{position:absolute;bottom:0;left:0;right:0;height:76px;background:rgba(8,11,18,.9);backdrop-filter:blur(16px);border-top:1px solid var(--line);display:flex;z-index:30}
+  .nav button{flex:1;background:none;border:0;color:var(--sub);font-family:inherit;font-size:10.5px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;padding-bottom:8px}
+  .nav button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.6}
+  .nav button.on{color:var(--gold2)}
   .tab{display:none}.tab.on{display:block;animation:fade .3s ease}
   @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 
   /* wallet sheet */
-  .sheet-bg{position:absolute;inset:0;background:rgba(0,0,0,.55);z-index:50;display:none;align-items:flex-end}
+  .sheet-bg{position:absolute;inset:0;background:rgba(0,0,0,.6);z-index:50;display:none;align-items:flex-end}
   .sheet-bg.on{display:flex;animation:fade .25s}
-  .sheet{width:100%;background:var(--card);border-radius:26px 26px 0 0;border-top:1px solid var(--line);padding:20px 20px 28px;animation:up .35s ease}
+  .sheet{width:100%;background:var(--panel);border-radius:24px 24px 0 0;border-top:1px solid var(--line);padding:18px 20px 28px;animation:up .35s ease}
   @keyframes up{from{transform:translateY(100%)}to{transform:none}}
-  .grab{width:44px;height:5px;border-radius:3px;background:#39456e;margin:0 auto 16px}
-  .wallet-card{border-radius:18px;padding:18px;background:linear-gradient(135deg,#2a3566,#4b3aa0);position:relative;overflow:hidden;margin-bottom:16px}
-  .wallet-card .brand2{font-size:13px;opacity:.85}
-  .wallet-card .num{letter-spacing:3px;font-size:16px;margin-top:22px;font-weight:700}
-  .wallet-card .row{display:flex;justify-content:space-between;margin-top:14px;font-size:12px;opacity:.85}
-  .wallet-card::after{content:"";position:absolute;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,.08);top:-40px;left:-30px}
-  .pay-row{display:flex;justify-content:space-between;align-items:center;font-size:15px;padding:6px 0}
-  .pay-row.total{font-size:19px;font-weight:800;border-top:1px solid var(--line);margin-top:6px;padding-top:12px}
-
-  .success{text-align:center;padding:10px 4px}
-  .checkwrap{width:88px;height:88px;border-radius:50%;background:rgba(37,212,123,.15);display:grid;place-items:center;margin:6px auto 14px;animation:pop .4s}
-  .checkwrap .c{font-size:46px;color:var(--green)}
-  .toast{position:absolute;bottom:88px;left:16px;right:16px;background:#0e1428;border:1px solid var(--line);
-    border-radius:14px;padding:12px 14px;font-size:13px;z-index:60;box-shadow:var(--shadow);display:none;align-items:center;gap:8px}
-  .toast.on{display:flex;animation:fade .3s}
+  .grab{width:42px;height:5px;border-radius:3px;background:#2c3552;margin:0 auto 16px}
+  .eyebrow2{color:var(--sub);font-size:11px;letter-spacing:2px;text-transform:uppercase;margin-bottom:14px}
+  .metal{border-radius:16px;padding:20px;background:linear-gradient(135deg,#1a1a1f 0%,#0c0c10 55%,#22201a 100%);border:1px solid rgba(201,168,106,.35);position:relative;overflow:hidden;margin-bottom:16px}
+  .metal::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 40%,rgba(231,214,172,.12) 50%,transparent 60%)}
+  .metal .brow{display:flex;justify-content:space-between;align-items:center}
+  .metal .co{font-family:var(--serif);color:var(--gold2);font-size:15px;letter-spacing:1px}
+  .metal .type{font-size:10px;letter-spacing:2px;color:var(--sub);text-transform:uppercase}
+  .metal .num{letter-spacing:4px;font-family:var(--serif);font-size:17px;margin-top:24px;color:#e9e7df}
+  .metal .brow2{display:flex;justify-content:space-between;margin-top:14px;font-size:11px;color:var(--sub)}
+  .prow{display:flex;justify-content:space-between;align-items:center;font-size:14px;padding:7px 0;color:#d7dbe6}
+  .prow.total{font-family:var(--serif);font-size:19px;color:var(--txt);border-top:1px solid var(--line);margin-top:6px;padding-top:13px}
+  .success{text-align:center;padding:8px 4px 4px}
+  .seal{width:82px;height:82px;border-radius:50%;border:1px solid rgba(201,168,106,.5);background:var(--goldsoft);display:grid;place-items:center;margin:4px auto 14px;animation:pop .4s}
+  .seal svg{width:38px;height:38px;stroke:var(--gold2);fill:none;stroke-width:2}
+  .toast{position:absolute;bottom:90px;left:16px;right:16px;background:#0c111c;border:1px solid var(--line);border-radius:13px;padding:12px 14px;font-size:12.5px;z-index:60;box-shadow:var(--shadow);display:none;color:#dfe3ee}
+  .toast.on{display:block;animation:fade .3s}
 </style>
 </head>
 <body>
 <div class="phone">
   <div class="notch"></div>
-
   <div class="screen">
-    <div class="brandrow">
-      <div class="brand"><div class="logo">🧠</div> כדאי?</div>
+    <div class="top">
+      <div class="brand">
+        <div class="mono"><b>א</b></div>
+        <div>
+          <div class="name">אוצר</div>
+          <div class="tagline">Private Wealth</div>
+        </div>
+      </div>
       <div class="avatar">א</div>
     </div>
 
-    <!-- ============ HOME / ASK TAB ============ -->
+    <!-- ============ OVERVIEW ============ -->
     <div class="tab on" id="tab-home">
-      <div class="card balance">
-        <div class="lbl">יתרה בחשבון</div>
-        <div class="big" id="balance">8,420<small> ₪</small></div>
-        <div class="avail">
-          <div class="pill green">
-            <div class="k">באמת פנוי החודש</div>
-            <div class="v" id="reallyFree">3,150 ₪</div>
-          </div>
-          <div class="pill amber">
-            <div class="k">חיובים קבועים שנותרו</div>
-            <div class="v">5,270 ₪</div>
-          </div>
+      <div class="card worth">
+        <div class="eyebrow"><span class="dot"></span> השווי הנקי שלך</div>
+        <div class="big" id="worth">312,480<small> ₪</small></div>
+        <div class="trend">▲ 4,120 ₪ (1.3%) החודש</div>
+        <svg class="spark" viewBox="0 0 300 44" preserveAspectRatio="none">
+          <defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="rgba(201,168,106,.35)"/><stop offset="1" stop-color="rgba(201,168,106,0)"/>
+          </linearGradient></defs>
+          <path d="M0,34 L30,30 L60,32 L90,24 L120,26 L150,18 L180,20 L210,12 L240,15 L270,7 L300,9" fill="none" stroke="#c9a86a" stroke-width="1.8"/>
+          <path d="M0,34 L30,30 L60,32 L90,24 L120,26 L150,18 L180,20 L210,12 L240,15 L270,7 L300,9 L300,44 L0,44 Z" fill="url(#g)"/>
+        </svg>
+        <div class="breakdown">
+          <div class="bd"><div class="k">נזיל</div><div class="v pos">68,900 ₪</div></div>
+          <div class="bd"><div class="k">השקעות</div><div class="v pos">271,400 ₪</div></div>
+          <div class="bd"><div class="k">התחייבויות</div><div class="v neg">−27,820 ₪</div></div>
         </div>
       </div>
 
-      <div class="card hero">
-        <h2>אני יכול להרשות לעצמי? 🤔</h2>
-        <p>כתוב מה בא לך לקנות — ואני אחשב רגע לפני שתשלם</p>
-        <div class="ask" style="margin-bottom:8px">
-          <input type="text" id="what" placeholder="על מה? (נעליים, מסעדה...)">
-        </div>
-        <div class="ask">
+      <div class="sec-head"><h3>כל הנכסים שלך — במקום אחד</h3><a href="#" onclick="return false">הכל</a></div>
+      <div class="tags" style="margin-bottom:12px">
+        <div class="tag on">הכל</div><div class="tag">חשבונות</div><div class="tag">כרטיסים</div><div class="tag">ביטוחים</div><div class="tag">השקעות</div>
+      </div>
+      <div class="card" id="assets"></div>
+
+      <div class="card consult">
+        <div class="eyebrow">התייעצות לפני הוצאה</div>
+        <h2>שווה לי לקנות את זה?</h2>
+        <p>כתוב מה מתוכנן — אבחן מול כל התמונה הפיננסית שלך, ואם תחליט כן, אשלם מהארנק.</p>
+        <div class="field"><input type="text" id="what" placeholder="על מה? (שעון, טיסה, ריהוט…)"></div>
+        <div class="field">
           <div class="amt"><input type="number" id="amount" placeholder="0" inputmode="numeric"><span>₪</span></div>
-          <button class="btn" style="margin-top:0;width:auto;padding:0 22px" onclick="decide()">בדוק</button>
+          <button class="btn" style="width:auto;padding:0 22px" onclick="decide()">בדוק</button>
         </div>
         <div class="quick">
-          <div class="chip" onclick="quick('קפה ומאפה',34)">☕ קפה 34₪</div>
-          <div class="chip" onclick="quick('מסעדה',180)">🍽️ מסעדה 180₪</div>
-          <div class="chip" onclick="quick('נעליים',420)">👟 נעליים 420₪</div>
-          <div class="chip" onclick="quick('טלוויזיה חדשה',3200)">📺 טלוויזיה 3200₪</div>
+          <div class="qchip" onclick="quick('ארוחה במסעדה',260)">מסעדה · 260₪</div>
+          <div class="qchip" onclick="quick('שעון',2400)">שעון · 2,400₪</div>
+          <div class="qchip" onclick="quick('טיסה לחו״ל',4800)">טיסה · 4,800₪</div>
         </div>
+        <div id="verdictHost"></div>
       </div>
-
-      <div id="verdictHost"></div>
     </div>
 
-    <!-- ============ SUBSCRIPTIONS TAB ============ -->
+    <!-- ============ ASSETS FULL ============ -->
+    <div class="tab" id="tab-assets">
+      <div class="sec-head" style="margin-top:2px"><h3>נכסים והתחייבויות</h3></div>
+      <div class="card" id="assetsFull"></div>
+      <div class="sec-head"><h3>הכיסוי הביטוחי שלך</h3></div>
+      <div class="card" id="insurance"></div>
+    </div>
+
+    <!-- ============ SUBSCRIPTIONS ============ -->
     <div class="tab" id="tab-subs">
+      <div class="sec-head" style="margin-top:2px"><h3>מנויים והוצאות קבועות</h3></div>
       <div class="card">
-        <div class="sec-title">🕵️ צייד המנויים והחיובים</div>
-        <p class="muted">מצאתי חיובים שכדאי שתבדוק. ביטול מנוי אחד = חיסכון של מאות שקלים בשנה.</p>
-        <ul class="sub-list" id="subsList"></ul>
+        <p class="muted" style="margin:0 0 8px">זיהיתי חיובים ששווה לבחון. ביטול מנוי אחד לרוב חוסך מאות שקלים בשנה.</p>
+        <div id="subsList"></div>
       </div>
     </div>
 
-    <!-- ============ CHAT TAB ============ -->
+    <!-- ============ BANKER ============ -->
     <div class="tab" id="tab-chat">
       <div class="card">
-        <div class="sec-title">💬 שאל אותי הכל על הכסף שלך</div>
+        <div class="banker-head">
+          <div class="banker-av">נ</div>
+          <div>
+            <div style="font-family:var(--serif);font-size:16px">נועה · הבנקאית האישית שלך</div>
+            <div class="muted" style="font-size:11.5px">זמינה תמיד · מכירה את כל התמונה שלך</div>
+          </div>
+        </div>
+        <div class="hairline"></div>
         <div class="chat" id="chatBox">
-          <div class="msg bot">היי אדיר 👋 אני העוזר הכלכלי שלך. שאל אותי משהו, למשל "כמה בזבזתי על אוכל החודש?"</div>
+          <div class="msg bot">ערב טוב אדיר. אני כאן כדי לעזור לך לנהל את ההון בחוכמה. מה תרצה לבדוק?</div>
         </div>
-        <div class="quick" style="justify-content:flex-start;margin-top:14px">
-          <div class="chip" onclick="chatAsk('כמה בזבזתי על אוכל החודש?')">אוכל החודש?</div>
-          <div class="chip" onclick="chatAsk('כמה נשאר לי עד סוף החודש?')">כמה נשאר?</div>
-          <div class="chip" onclick="chatAsk('איך אני חוסך לחופשה?')">חיסכון לחופשה</div>
+        <div class="quick" style="margin-top:14px">
+          <div class="qchip" onclick="chatAsk('כמה באמת פנוי לי החודש?')">כמה פנוי?</div>
+          <div class="qchip" onclick="chatAsk('איך ההשקעות שלי מתפקדות?')">תיק ההשקעות</div>
+          <div class="qchip" onclick="chatAsk('איפה אני מבזבז מיותר?')">בזבוז מיותר</div>
         </div>
-      </div>
-    </div>
-
-    <!-- ============ GOALS TAB ============ -->
-    <div class="tab" id="tab-goals">
-      <div class="card">
-        <div class="sec-title">🎯 אוטו-חיסכון חכם</div>
-        <p class="muted">בכל פעם שיש לך עודף — אני מזיז ממנו קצת הצידה בשקט. עד עכשיו חסכתי לך:</p>
-        <div class="big" style="font-size:34px;font-weight:800;margin:6px 0 2px">1,940 <small style="font-size:18px;color:var(--sub)">₪</small></div>
-        <div style="margin-top:16px">
-          <div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px"><span>✈️ חופשה ביוון</span><span class="muted">1,940 / 6,000 ₪</span></div>
-          <div style="height:12px;background:#0e1428;border-radius:8px;overflow:hidden;border:1px solid var(--line)"><div style="width:32%;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2))"></div></div>
-        </div>
-        <button class="btn ghost" onclick="toast('💡 קצב נוכחי: תגיע ליעד תוך כ-4 חודשים')">איך אני מתקדם?</button>
       </div>
     </div>
   </div>
 
-  <!-- toast -->
   <div class="toast" id="toast"></div>
 
-  <!-- wallet sheet -->
   <div class="sheet-bg" id="sheet" onclick="if(event.target===this)closeSheet()">
     <div class="sheet" id="sheetInner"></div>
   </div>
 
-  <!-- bottom nav -->
   <div class="nav">
-    <button class="on" data-tab="home" onclick="go('home',this)"><span class="ni">🏠</span>בית</button>
-    <button data-tab="subs" onclick="go('subs',this)"><span class="ni">🕵️</span>מנויים</button>
-    <button data-tab="chat" onclick="go('chat',this)"><span class="ni">💬</span>עוזר</button>
-    <button data-tab="goals" onclick="go('goals',this)"><span class="ni">🎯</span>חיסכון</button>
+    <button class="on" onclick="go('home',this)"><svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5M5 9.5V21h14V9.5"/></svg>סקירה</button>
+    <button onclick="go('assets',this)"><svg viewBox="0 0 24 24"><path d="M3 7h18v12H3zM3 7l3-3h12l3 3M8 12h8"/></svg>נכסים</button>
+    <button onclick="go('subs',this)"><svg viewBox="0 0 24 24"><path d="M12 3v18M7 7h7a3 3 0 0 1 0 6H9a3 3 0 0 0 0 6h8"/></svg>מנויים</button>
+    <button onclick="go('chat',this)"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H8l-4 4z"/></svg>בנקאית</button>
   </div>
 </div>
 
 <script>
-/* ---------- מצב פיננסי מדומה של המשתמש ---------- */
-const state = {
-  balance: 8420,          // יתרה בחשבון
-  upcomingBills: 5270,    // חיובים קבועים שעוד יגיעו החודש (שכ"ד, הלוואה, מנויים...)
-  savingsGoalMonthly: 1000, // כמה הוא רוצה לחסוך החודש
-  daysLeftInMonth: 12,
-  cardLast4: '4417'
+/* ---------- SVG icons ---------- */
+const IC = {
+  bank:'<svg viewBox="0 0 24 24"><path d="M3 9 12 4l9 5M4 9v9m5-9v9m6-9v9m5-9v9M3 20h18"/></svg>',
+  card:'<svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18M7 15h4"/></svg>',
+  invest:'<svg viewBox="0 0 24 24"><path d="M4 18 10 12l3 3 7-8M20 7h-4M20 7v4"/></svg>',
+  shield:'<svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/></svg>',
+  car:'<svg viewBox="0 0 24 24"><path d="M5 16v2m14-2v2M4 16l1.5-5A2 2 0 0 1 7.4 9.6h9.2a2 2 0 0 1 1.9 1.4L20 16zM3 16h18M7 13h10"/></svg>',
+  home:'<svg viewBox="0 0 24 24"><path d="M4 11 12 5l8 6M6 10v9h12v-9"/></svg>',
+  sub:'<svg viewBox="0 0 24 24"><path d="M4 6h16v12H4zM4 10h16"/></svg>'
 };
-function reallyFree(){ return state.balance - state.upcomingBills - state.savingsGoalMonthly; }
+
+/* ---------- מצב פיננסי מאוחד ---------- */
+const state = {
+  liquid: 68900, investments: 271400, liabilities: 27820,
+  upcomingBills: 9200,        // חיובים קבועים שנותרו החודש
+  savingsGoalMonthly: 2500,
+  daysLeftInMonth: 12,
+};
+function netWorth(){ return state.liquid + state.investments - state.liabilities; }
+function reallyFree(){ return state.liquid - state.upcomingBills - state.savingsGoalMonthly; }
+function nis(n){ return Math.round(n).toLocaleString('he-IL')+' ₪'; }
+
+/* ---------- נכסים מאוחדים ---------- */
+const assets = [
+  {ic:'bank',  name:'עו״ש · לאומי',        meta:'זמין',                 val:'32,400 ₪',  sub:'נזיל'},
+  {ic:'bank',  name:'פיקדון · מזרחי',       meta:'נזיל בעוד 40 יום',      val:'36,500 ₪',  sub:'חיסכון'},
+  {ic:'card',  name:'ויזה זהב',             meta:'חיוב ב-10 לחודש',      val:'−6,240 ₪',  sub:'ניצול 41%', neg:true},
+  {ic:'invest',name:'תיק השקעות · IBI',     meta:'S&P 500 + אג״ח',       val:'271,400 ₪', sub:'▲ 8.2% השנה'},
+  {ic:'home',  name:'משכנתא',               meta:'נותרו 14 שנה',         val:'−21,580 ₪', sub:'יתרה', neg:true},
+];
+const insurance = [
+  {ic:'shield',name:'ביטוח חיים · הראל',    meta:'כיסוי 1.2M ₪',   val:'184 ₪',  sub:'לחודש'},
+  {ic:'car',   name:'ביטוח רכב מקיף',       meta:'מתחדש בספטמבר',   val:'312 ₪',  sub:'לחודש'},
+  {ic:'shield',name:'ביטוח בריאות פרטי',    meta:'משפחתי',          val:'268 ₪',  sub:'לחודש'},
+  {ic:'home',  name:'ביטוח דירה',           meta:'מבנה + תכולה',    val:'96 ₪',   sub:'לחודש'},
+];
+function rowHTML(a){
+  return `<div class="arow"><div class="aicon">${IC[a.ic]}</div>
+    <div><div class="aname">${a.name}</div><div class="ameta">${a.meta}</div></div>
+    <div class="aval"><div class="n ${a.neg?'neg':''}">${a.val}</div><div class="s">${a.sub}</div></div></div>`;
+}
+function renderAssets(){
+  document.getElementById('assets').innerHTML = assets.slice(0,4).map(rowHTML).join('');
+  document.getElementById('assetsFull').innerHTML = assets.map(rowHTML).join('');
+  document.getElementById('insurance').innerHTML = insurance.map(rowHTML).join('');
+}
 
 /* ---------- מנוע ההחלטה ---------- */
 function verdictFor(amount){
-  const free = reallyFree();
-  const afterPay = free - amount;
-  const dailySafe = Math.max(0, (state.balance - state.upcomingBills) / state.daysLeftInMonth);
-
-  if(amount <= 0 || isNaN(amount)) return null;
-
-  // ✅ כן — יש שפע
-  if(afterPay >= 300){
-    return {type:'yes', title:'כן, לך על זה 🎉', reasons:[
-      ['✅', `אחרי הקנייה יישארו לך <b>${nis(afterPay)}</b> פנויים החודש`],
-      ['🎯', `היעד חיסכון שלך (${nis(state.savingsGoalMonthly)}) עדיין מובטח`],
-      ['📅', `זה בערך ${(amount/Math.max(1,dailyBudget())).toFixed(1)} ימים מהתקציב היומי שלך — קל`]
-    ]};
-  }
-  // ⚠️ כן אבל — אפשרי אך על חשבון משהו
-  if(afterPay >= -200){
-    const delay = Math.ceil(Math.abs(afterPay-300)/500);
-    return {type:'maybe', title:'אפשר, אבל שים לב ⚠️', reasons:[
-      ['💸', `יישארו לך רק <b>${nis(Math.max(0,free-amount+state.savingsGoalMonthly))}</b> עד ה-1 לחודש`],
-      ['🎯', `זה ייגע בחיסכון לחופשה — היעד יידחה בכ-${1+delay} שבועות`],
-      ['💡', `אם תוותר על זה השבוע — תחזור לגמרי למסלול`]
-    ]};
-  }
-  // ❌ לא — מסוכן
-  return {type:'no', title:'עדיף לא עכשיו 🛑', reasons:[
-    ['🔴', `אתה עלול להיכנס למינוס — חסרים כ-<b>${nis(Math.abs(afterPay+state.savingsGoalMonthly))}</b>`],
-    ['📆', `יש לך חיובים קבועים של ${nis(state.upcomingBills)} שעוד לא ירדו`],
-    ['⏳', `חכה ${state.daysLeftInMonth} ימים למשכורת — ואז זה יהיה בטוח`]
-  ]};
+  const free = reallyFree(); const afterPay = free - amount;
+  if(amount<=0||isNaN(amount)) return null;
+  if(afterPay>=1500) return {type:'yes',badge:'מומלץ',title:'כן — זה בהישג ידך',reasons:[
+    `אחרי ההוצאה יישארו ${nis(afterPay)} פנויים, ויעד החיסכון (${nis(state.savingsGoalMonthly)}) נשמר`,
+    `ההוצאה היא כ-${(amount/netWorth()*100).toFixed(1)}% מהשווי הנקי שלך — זניח`,
+    `תזרים החודש איתן; אין חיוב חריג לפניך`]};
+  if(afterPay>=-500) return {type:'maybe',badge:'בזהירות',title:'אפשרי — אך על חשבון משהו',reasons:[
+    `יישארו לך רק ${nis(Math.max(0,free-amount+state.savingsGoalMonthly))} עד ה-1 לחודש`,
+    `זה ייגע בהפרשה החודשית לחיסכון — היעד יידחה בכשבועיים`,
+    `שקול לפרוס ל-3 תשלומים, או לדחות בשבוע ולחזור למסלול`]};
+  return {type:'no',badge:'לא מומלץ',title:'עדיף להמתין',reasons:[
+    `לפניך ${nis(state.upcomingBills)} חיובים קבועים שטרם ירדו — ההוצאה עלולה להכניס אותך למינוס`,
+    `כדי לשמור על התיק, אל תמשוך מההשקעות עבור הוצאה שוטפת`,
+    `בעוד ${state.daysLeftInMonth} ימים נכנסת המשכורת — אז זה יהיה בטוח לחלוטין`]};
 }
-function dailyBudget(){ return Math.max(1,(state.balance-state.upcomingBills)/state.daysLeftInMonth); }
-function nis(n){ return Math.round(n).toLocaleString('he-IL')+' ₪'; }
-
-let pending = null; // {what, amount}
+let pending=null;
 function decide(){
-  const amount = parseFloat(document.getElementById('amount').value);
-  const what = document.getElementById('what').value.trim() || 'הקנייה';
-  const v = verdictFor(amount);
-  const host = document.getElementById('verdictHost');
-  if(!v){ host.innerHTML=''; toast('כתוב סכום כדי שאבדוק 🙂'); return; }
-  pending = {what, amount};
-
-  const canPay = v.type !== 'no';
-  const reasons = v.reasons.map(r=>`<li><span class="ri">${r[0]}</span><span>${r[1]}</span></li>`).join('');
-  host.innerHTML = `
-    <div class="verdict ${v.type}">
-      <div class="head">
-        <div class="vicon">${v.type==='yes'?'😎':v.type==='maybe'?'🤨':'🛑'}</div>
-        <div>
-          <div class="ttl">${v.title}</div>
-          <div class="amtline">${what} · <b>${nis(amount)}</b></div>
-        </div>
-      </div>
-      <ul class="reasons">${reasons}</ul>
-      ${ canPay
-        ? `<button class="btn pay" onclick="openWallet()">כן, שלם ${nis(amount)} 💳</button>`
-        : `<button class="btn ghost" onclick="toast('כל הכבוד על האיפוק 💪 חסכת מעצמך כאב ראש')">הבנתי, אני מוותר בינתיים</button>`}
-    </div>`;
-  host.scrollIntoView({behavior:'smooth', block:'center'});
+  const amount=parseFloat(document.getElementById('amount').value);
+  const what=document.getElementById('what').value.trim()||'ההוצאה';
+  const v=verdictFor(amount); const host=document.getElementById('verdictHost');
+  if(!v){host.innerHTML='';toast('כתוב סכום כדי שאבחן עבורך.');return;}
+  pending={what,amount};
+  const canPay=v.type!=='no';
+  const reasons=v.reasons.map(r=>`<li><span class="m"></span><span>${r}</span></li>`).join('');
+  host.innerHTML=`<div class="verdict ${v.type}">
+    <div class="vhead"><span class="vbadge">${v.badge}</span></div>
+    <div class="vttl">${v.title}</div>
+    <div class="vsub">${what} · ${nis(amount)}</div>
+    <ul class="reasons">${reasons}</ul>
+    ${canPay
+      ?`<button class="btn pay" style="margin-top:15px" onclick="openWallet()">אשר ושלם ${nis(amount)}</button>`
+      :`<button class="btn ghost" style="margin-top:15px" onclick="toast('החלטה נבונה. שמרת על היעדים שלך.')">הבנתי — אמתין</button>`}
+  </div>`;
+  host.scrollIntoView({behavior:'smooth',block:'center'});
 }
-function quick(what,amt){ document.getElementById('what').value=what; document.getElementById('amount').value=amt; decide(); }
+function quick(w,a){document.getElementById('what').value=w;document.getElementById('amount').value=a;decide();}
 
-/* ---------- ארנק דיגיטלי ---------- */
+/* ---------- ארנק ---------- */
 function openWallet(){
-  if(!pending) return;
-  const {what, amount} = pending;
-  document.getElementById('sheetInner').innerHTML = `
+  const {what,amount}=pending;
+  document.getElementById('sheetInner').innerHTML=`
     <div class="grab"></div>
-    <div class="sec-title" style="margin-top:0">💳 אישור תשלום מהארנק</div>
-    <div class="wallet-card">
-      <div class="brand2">כדאי? Wallet · Visa</div>
-      <div class="num">•••• •••• •••• ${state.cardLast4}</div>
-      <div class="row"><span>אדיר ר.</span><span>יתרה: ${nis(state.balance)}</span></div>
+    <div class="eyebrow2">אישור תשלום · ארנק אוצר</div>
+    <div class="metal">
+      <div class="brow"><div class="co">אוצר</div><div class="type">Visa Infinite</div></div>
+      <div class="num">•••• •••• •••• 4417</div>
+      <div class="brow2"><span>אדיר ר.</span><span>נזיל: ${nis(state.liquid)}</span></div>
     </div>
-    <div class="pay-row"><span>${what}</span><span>${nis(amount)}</span></div>
-    <div class="pay-row"><span class="muted">עמלה</span><span class="muted">0 ₪</span></div>
-    <div class="pay-row total"><span>סה"כ לתשלום</span><span>${nis(amount)}</span></div>
-    <button class="btn pay" onclick="confirmPay()">אשר תשלום 🔒</button>
-    <button class="btn ghost" onclick="closeSheet()">ביטול</button>`;
+    <div class="prow"><span>${what}</span><span>${nis(amount)}</span></div>
+    <div class="prow"><span class="muted">עמלה</span><span class="muted">0 ₪</span></div>
+    <div class="prow total"><span>סה״כ</span><span>${nis(amount)}</span></div>
+    <button class="btn pay" style="margin-top:14px" onclick="confirmPay()">אשר תשלום מאובטח</button>
+    <button class="btn ghost" style="margin-top:9px" onclick="closeSheet()">ביטול</button>`;
   document.getElementById('sheet').classList.add('on');
 }
 function confirmPay(){
-  const {what, amount} = pending;
-  state.balance -= amount;
-  document.getElementById('sheetInner').innerHTML = `
+  const {what,amount}=pending; state.liquid-=amount;
+  document.getElementById('sheetInner').innerHTML=`
     <div class="grab"></div>
     <div class="success">
-      <div class="checkwrap"><div class="c">✓</div></div>
-      <div style="font-size:22px;font-weight:800">שולם בהצלחה!</div>
-      <div class="muted" style="margin-top:6px">${nis(amount)} עבור ${what}</div>
-      <div class="muted" style="margin-top:2px">יתרה חדשה: <b style="color:var(--txt)">${nis(state.balance)}</b></div>
+      <div class="seal"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>
+      <div style="font-family:var(--serif);font-size:21px">התשלום בוצע</div>
+      <div class="muted" style="margin-top:6px">${nis(amount)} · ${what}</div>
+      <div class="muted" style="margin-top:2px">שווי נקי מעודכן: <b style="color:var(--gold2)">${nis(netWorth())}</b></div>
     </div>
-    <button class="btn" onclick="closeSheet(true)">סיום</button>`;
+    <button class="btn" style="margin-top:14px" onclick="closeSheet(true)">סיום</button>`;
   refresh();
 }
 function closeSheet(clear){
   document.getElementById('sheet').classList.remove('on');
-  if(clear){ document.getElementById('verdictHost').innerHTML=''; document.getElementById('amount').value=''; document.getElementById('what').value=''; pending=null; }
+  if(clear){document.getElementById('verdictHost').innerHTML='';document.getElementById('amount').value='';document.getElementById('what').value='';pending=null;}
 }
 function refresh(){
-  document.getElementById('balance').innerHTML = Math.round(state.balance).toLocaleString('he-IL')+'<small> ₪</small>';
-  document.getElementById('reallyFree').textContent = nis(Math.max(0,reallyFree())+state.savingsGoalMonthly);
+  document.getElementById('worth').innerHTML=Math.round(netWorth()).toLocaleString('he-IL')+'<small> ₪</small>';
 }
 
 /* ---------- מנויים ---------- */
-const subs = [
-  {ic:'🎬',name:'Netflix Premium',meta:'מנוי חודשי · חויב אתמול',price:'69.90 ₪',flag:'עלה ב-14% מאז השנה שעברה'},
-  {ic:'🎵',name:'Spotify',meta:'מנוי חודשי',price:'19.90 ₪',flag:null},
-  {ic:'🏋️',name:'מכון כושר "פיט"',meta:'לא נכנסת כבר 3 חודשים',price:'229 ₪',flag:'שילמת 687₪ בלי להשתמש'},
-  {ic:'☁️',name:'iCloud 200GB',meta:'מנוי חודשי',price:'11.90 ₪',flag:null},
-  {ic:'📺',name:'Disney+',meta:'תקופת ניסיון נגמרת מחר!',price:'34.90 ₪',flag:'יתחדש אוטומטית — בטל אם לא בשימוש'},
-  {ic:'📰',name:'עיתון דיגיטלי',meta:'חיוב כפול זוהה החודש',price:'2 × 44 ₪',flag:'זיהיתי חיוב כפול — נטפל בזה'}
+const subs=[
+  {ic:'sub',name:'Netflix Premium',meta:'חויב אתמול',price:'69.90 ₪',flag:'עלה 14% מאז אשתקד'},
+  {ic:'sub',name:'מכון כושר',meta:'לא נכנסת 3 חודשים',price:'229 ₪',flag:'שולם 687₪ ללא שימוש'},
+  {ic:'sub',name:'Disney+',meta:'הניסיון מסתיים מחר',price:'34.90 ₪',flag:'יתחדש אוטומטית'},
+  {ic:'sub',name:'עיתון דיגיטלי',meta:'חיוב כפול החודש',price:'2×44 ₪',flag:'זוהה כפל חיוב — נטפל'},
+  {ic:'sub',name:'iCloud 200GB',meta:'מנוי חודשי',price:'11.90 ₪',flag:null},
 ];
 function renderSubs(){
-  document.getElementById('subsList').innerHTML = subs.map((s,i)=>`
-    <li class="sub-item">
-      <div class="sub-ic">${s.ic}</div>
-      <div>
-        <div class="sub-name">${s.name}</div>
-        <div class="sub-meta">${s.meta}</div>
-        ${s.flag?`<span class="flag">⚠️ ${s.flag}</span>`:''}
-      </div>
-      <div class="sub-price">${s.price}<br><button class="kill" onclick="killSub(${i},this)">בטל</button></div>
-    </li>`).join('');
+  document.getElementById('subsList').innerHTML=subs.map((s,i)=>`
+    <div class="arow"><div class="aicon">${IC.sub}</div>
+      <div><div class="aname">${s.name}</div><div class="ameta">${s.meta}</div>${s.flag?`<span class="flag">${s.flag}</span>`:''}</div>
+      <div class="aval"><div class="n">${s.price}</div><button class="kill" onclick="killSub(${i},this)">בטל</button></div>
+    </div>`).join('');
 }
-function killSub(i,btn){
-  btn.textContent='בוטל ✓'; btn.style.opacity=.6; btn.disabled=true;
-  toast(`ביטלתי את "${subs[i].name}" — חיסכון שנתי בדרך 💰`);
-}
+function killSub(i,btn){btn.textContent='בוטל';btn.disabled=true;btn.style.opacity=.5;toast(`"${subs[i].name}" בוטל — חיסכון שנתי בדרך.`);}
 
-/* ---------- צ'אט ---------- */
+/* ---------- בנקאית ---------- */
 function chatAsk(q){
   const box=document.getElementById('chatBox');
   box.insertAdjacentHTML('beforeend',`<div class="msg me">${q}</div>`);
-  const ans = answer(q);
-  setTimeout(()=>{ box.insertAdjacentHTML('beforeend',`<div class="msg bot">${ans}</div>`); box.scrollTop=box.scrollHeight; },350);
+  const a=answer(q);
+  setTimeout(()=>{box.insertAdjacentHTML('beforeend',`<div class="msg bot">${a}</div>`);box.scrollTop=box.scrollHeight;},380);
   box.scrollTop=box.scrollHeight;
 }
 function answer(q){
-  if(q.includes('אוכל')) return '🍔 החודש בזבזת <b>1,240 ₪</b> על אוכל בחוץ — 18% יותר מהרגיל. רוב זה במשלוחים בסופ"ש. אם תקצץ ב-2 משלוחים תחסוך ~300₪.';
-  if(q.includes('נשאר')) return `💰 באמת פנוי לך <b>${nis(Math.max(0,reallyFree())+state.savingsGoalMonthly)}</b> עד סוף החודש, אחרי כל החיובים הקבועים. זה כ-${nis(dailyBudget())} ליום.`;
-  if(q.includes('חופשה')) return '✈️ כדי להגיע ל-6,000₪ לחופשה תוך 4 חודשים, אני צריך להזיז ~1,000₪ בחודש. יש לך מקום לזה — אפעיל אוטו-חיסכון?';
-  return 'שאלה טובה! בגרסה המלאה אני מתחבר לחשבון הבנק שלך ועונה על הכל בזמן אמת 😊';
+  if(q.includes('פנוי'))return `באמת פנוי לך <b>${nis(Math.max(0,reallyFree())+state.savingsGoalMonthly)}</b> החודש, אחרי כל החיובים הקבועים וההפרשה לחיסכון.`;
+  if(q.includes('השקע')||q.includes('תיק'))return 'תיק ההשקעות שלך ב-IBI עלה <b>8.2%</b> השנה — מעל הבנצ׳מרק. החשיפה מאוזנת: 70% מניות, 30% אג״ח.';
+  if(q.includes('בזבז')||q.includes('מיותר'))return 'שני דגלים: מכון כושר ב-229₪ ללא שימוש 3 חודשים, וכפל חיוב בעיתון הדיגיטלי. ביטול שניהם = כ-<b>3,300₪ בשנה</b>.';
+  return 'בגרסה המלאה אני מחוברת לכל החשבונות שלך ועונה בזמן אמת. מה עוד תרצה לבדוק?';
 }
 
-/* ---------- ניווט + טוסט ---------- */
+/* ---------- ניווט ---------- */
 function go(tab,btn){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
   document.getElementById('tab-'+tab).classList.add('on');
   document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');
-  document.querySelector('.screen').scrollTop=0;
+  btn.classList.add('on');document.querySelector('.screen').scrollTop=0;
 }
 let toastT;
-function toast(msg){
-  const t=document.getElementById('toast'); t.innerHTML='💬 '+msg; t.classList.add('on');
-  clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('on'),2600);
-}
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),2800);}
 
-renderSubs(); refresh();
-document.getElementById('amount').addEventListener('keydown',e=>{ if(e.key==='Enter')decide(); });
+renderAssets();renderSubs();refresh();
+document.getElementById('amount').addEventListener('keydown',e=>{if(e.key==='Enter')decide();});
 </script>
 </body>
 </html>
