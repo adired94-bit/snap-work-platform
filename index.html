@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0b0f1a">
+<title>כדאי? — לפני שאתה משלם</title>
+<style>
+  :root{
+    --bg:#0b0f1a; --card:#151b2e; --card2:#1c2440; --line:#26304f;
+    --txt:#eef2ff; --sub:#93a0c4; --accent:#5b8cff; --accent2:#7c5bff;
+    --green:#25d47b; --amber:#ffb531; --red:#ff5d6c;
+    --shadow:0 18px 50px rgba(0,0,0,.55);
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+  html,body{margin:0;height:100%}
+  body{
+    font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    background:radial-gradient(1200px 700px at 70% -10%,#1a2547 0%,#0b0f1a 55%);
+    color:var(--txt); display:flex; align-items:center; justify-content:center;
+    min-height:100vh; padding:18px;
+  }
+  /* phone frame */
+  .phone{
+    width:390px; max-width:100%; height:min(844px,94vh);
+    background:var(--bg); border-radius:42px; position:relative; overflow:hidden;
+    box-shadow:var(--shadow),0 0 0 10px #05070d,0 0 0 12px #1b2340;
+    display:flex; flex-direction:column;
+  }
+  .notch{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:130px;height:26px;background:#05070d;border-radius:16px;z-index:40}
+  .screen{flex:1;overflow-y:auto;overflow-x:hidden;padding:54px 18px 92px;scrollbar-width:none}
+  .screen::-webkit-scrollbar{display:none}
+
+  .brandrow{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+  .brand{display:flex;align-items:center;gap:9px;font-weight:800;font-size:20px;letter-spacing:.5px}
+  .logo{width:34px;height:34px;border-radius:11px;background:linear-gradient(135deg,var(--accent),var(--accent2));
+    display:grid;place-items:center;font-size:19px;box-shadow:0 6px 18px rgba(91,140,255,.5)}
+  .avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#ffb531,#ff5d6c);display:grid;place-items:center;font-weight:700}
+
+  .card{background:linear-gradient(160deg,var(--card),var(--card2));border:1px solid var(--line);border-radius:22px;padding:18px;margin-bottom:14px}
+  .balance .lbl{color:var(--sub);font-size:13px;margin-bottom:4px}
+  .balance .big{font-size:38px;font-weight:800;letter-spacing:-1px}
+  .balance .big small{font-size:20px;color:var(--sub);font-weight:600}
+  .avail{display:flex;gap:10px;margin-top:14px}
+  .pill{flex:1;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:14px;padding:10px 12px}
+  .pill .k{color:var(--sub);font-size:11px}
+  .pill .v{font-size:17px;font-weight:800;margin-top:2px}
+  .pill.green .v{color:var(--green)} .pill.amber .v{color:var(--amber)}
+
+  .hero{background:linear-gradient(150deg,#1d2a55,#221c4d);border:1px solid #34407a;text-align:center}
+  .hero h2{margin:2px 0 3px;font-size:19px}
+  .hero p{margin:0 0 14px;color:var(--sub);font-size:13px}
+  .ask{display:flex;gap:8px}
+  .ask input[type=text]{flex:1;background:#0e1428;border:1px solid var(--line);border-radius:14px;color:var(--txt);
+    padding:14px 14px;font-size:16px;outline:none;font-family:inherit}
+  .ask input::placeholder{color:#5f6d94}
+  .amt{position:relative;flex:1.1}
+  .amt input{width:100%;background:#0e1428;border:1px solid var(--line);border-radius:14px;color:var(--txt);
+    padding:14px 34px 14px 14px;font-size:18px;font-weight:800;outline:none;font-family:inherit}
+  .amt span{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--sub);font-weight:800}
+  .btn{border:0;border-radius:14px;padding:15px;font-size:16px;font-weight:800;font-family:inherit;cursor:pointer;color:#fff;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));width:100%;margin-top:12px;box-shadow:0 10px 24px rgba(91,140,255,.35)}
+  .btn:active{transform:scale(.98)}
+  .btn.ghost{background:rgba(255,255,255,.06);border:1px solid var(--line);box-shadow:none}
+  .btn.pay{background:linear-gradient(135deg,#25d47b,#12a45c)}
+  .btn:disabled{opacity:.5}
+
+  .quick{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;justify-content:center}
+  .chip{background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:999px;padding:8px 13px;font-size:13px;cursor:pointer;color:var(--sub)}
+  .chip:active{background:rgba(255,255,255,.12)}
+
+  /* verdict */
+  .verdict{border-radius:22px;padding:20px;margin-bottom:14px;border:1px solid;animation:pop .35s ease}
+  @keyframes pop{from{transform:scale(.92);opacity:0}to{transform:scale(1);opacity:1}}
+  .verdict.yes{background:linear-gradient(150deg,rgba(37,212,123,.16),rgba(37,212,123,.04));border-color:rgba(37,212,123,.5)}
+  .verdict.maybe{background:linear-gradient(150deg,rgba(255,181,49,.16),rgba(255,181,49,.04));border-color:rgba(255,181,49,.5)}
+  .verdict.no{background:linear-gradient(150deg,rgba(255,93,108,.16),rgba(255,93,108,.04));border-color:rgba(255,93,108,.5)}
+  .verdict .head{display:flex;align-items:center;gap:12px}
+  .vicon{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;font-size:28px;flex:0 0 auto}
+  .yes .vicon{background:rgba(37,212,123,.2)} .maybe .vicon{background:rgba(255,181,49,.2)} .no .vicon{background:rgba(255,93,108,.2)}
+  .verdict .ttl{font-size:22px;font-weight:800}
+  .yes .ttl{color:var(--green)} .maybe .ttl{color:var(--amber)} .no .ttl{color:var(--red)}
+  .verdict .amtline{color:var(--sub);font-size:13px;margin-top:2px}
+  .reasons{list-style:none;padding:0;margin:15px 0 0}
+  .reasons li{display:flex;gap:9px;align-items:flex-start;padding:8px 0;border-top:1px solid rgba(255,255,255,.06);font-size:14px;line-height:1.4}
+  .reasons li:first-child{border-top:0}
+  .reasons .ri{flex:0 0 auto;font-size:16px}
+
+  .sub-list{list-style:none;padding:0;margin:0}
+  .sub-item{display:flex;align-items:center;gap:12px;padding:13px 0;border-top:1px solid rgba(255,255,255,.06)}
+  .sub-item:first-child{border-top:0}
+  .sub-ic{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-size:20px;background:rgba(255,255,255,.06);flex:0 0 auto}
+  .sub-name{font-weight:700}.sub-meta{color:var(--sub);font-size:12px;margin-top:2px}
+  .sub-price{font-weight:800;margin-inline-start:auto;text-align:end}
+  .flag{font-size:11px;color:var(--amber);background:rgba(255,181,49,.12);padding:2px 7px;border-radius:8px;display:inline-block;margin-top:3px}
+  .kill{background:rgba(255,93,108,.14);color:var(--red);border:1px solid rgba(255,93,108,.4);border-radius:10px;padding:7px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
+
+  .chat{display:flex;flex-direction:column;gap:10px}
+  .msg{max-width:82%;padding:11px 14px;border-radius:16px;font-size:14px;line-height:1.45}
+  .msg.bot{background:var(--card2);border:1px solid var(--line);border-end-start-radius:5px;align-self:flex-start}
+  .msg.me{background:linear-gradient(135deg,var(--accent),var(--accent2));border-end-end-radius:5px;align-self:flex-end;color:#fff}
+
+  .sec-title{font-size:15px;font-weight:800;margin:6px 2px 10px;display:flex;align-items:center;gap:8px}
+  .muted{color:var(--sub);font-size:13px;line-height:1.5}
+
+  /* bottom nav */
+  .nav{position:absolute;bottom:0;left:0;right:0;height:74px;background:rgba(11,15,26,.86);backdrop-filter:blur(14px);
+    border-top:1px solid var(--line);display:flex;z-index:30}
+  .nav button{flex:1;background:none;border:0;color:var(--sub);font-family:inherit;font-size:11px;display:flex;
+    flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;padding-bottom:8px}
+  .nav button .ni{font-size:21px}
+  .nav button.on{color:var(--accent)}
+
+  .tab{display:none}.tab.on{display:block;animation:fade .3s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  /* wallet sheet */
+  .sheet-bg{position:absolute;inset:0;background:rgba(0,0,0,.55);z-index:50;display:none;align-items:flex-end}
+  .sheet-bg.on{display:flex;animation:fade .25s}
+  .sheet{width:100%;background:var(--card);border-radius:26px 26px 0 0;border-top:1px solid var(--line);padding:20px 20px 28px;animation:up .35s ease}
+  @keyframes up{from{transform:translateY(100%)}to{transform:none}}
+  .grab{width:44px;height:5px;border-radius:3px;background:#39456e;margin:0 auto 16px}
+  .wallet-card{border-radius:18px;padding:18px;background:linear-gradient(135deg,#2a3566,#4b3aa0);position:relative;overflow:hidden;margin-bottom:16px}
+  .wallet-card .brand2{font-size:13px;opacity:.85}
+  .wallet-card .num{letter-spacing:3px;font-size:16px;margin-top:22px;font-weight:700}
+  .wallet-card .row{display:flex;justify-content:space-between;margin-top:14px;font-size:12px;opacity:.85}
+  .wallet-card::after{content:"";position:absolute;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,.08);top:-40px;left:-30px}
+  .pay-row{display:flex;justify-content:space-between;align-items:center;font-size:15px;padding:6px 0}
+  .pay-row.total{font-size:19px;font-weight:800;border-top:1px solid var(--line);margin-top:6px;padding-top:12px}
+
+  .success{text-align:center;padding:10px 4px}
+  .checkwrap{width:88px;height:88px;border-radius:50%;background:rgba(37,212,123,.15);display:grid;place-items:center;margin:6px auto 14px;animation:pop .4s}
+  .checkwrap .c{font-size:46px;color:var(--green)}
+  .toast{position:absolute;bottom:88px;left:16px;right:16px;background:#0e1428;border:1px solid var(--line);
+    border-radius:14px;padding:12px 14px;font-size:13px;z-index:60;box-shadow:var(--shadow);display:none;align-items:center;gap:8px}
+  .toast.on{display:flex;animation:fade .3s}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="notch"></div>
+
+  <div class="screen">
+    <div class="brandrow">
+      <div class="brand"><div class="logo">🧠</div> כדאי?</div>
+      <div class="avatar">א</div>
+    </div>
+
+    <!-- ============ HOME / ASK TAB ============ -->
+    <div class="tab on" id="tab-home">
+      <div class="card balance">
+        <div class="lbl">יתרה בחשבון</div>
+        <div class="big" id="balance">8,420<small> ₪</small></div>
+        <div class="avail">
+          <div class="pill green">
+            <div class="k">באמת פנוי החודש</div>
+            <div class="v" id="reallyFree">3,150 ₪</div>
+          </div>
+          <div class="pill amber">
+            <div class="k">חיובים קבועים שנותרו</div>
+            <div class="v">5,270 ₪</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card hero">
+        <h2>אני יכול להרשות לעצמי? 🤔</h2>
+        <p>כתוב מה בא לך לקנות — ואני אחשב רגע לפני שתשלם</p>
+        <div class="ask" style="margin-bottom:8px">
+          <input type="text" id="what" placeholder="על מה? (נעליים, מסעדה...)">
+        </div>
+        <div class="ask">
+          <div class="amt"><input type="number" id="amount" placeholder="0" inputmode="numeric"><span>₪</span></div>
+          <button class="btn" style="margin-top:0;width:auto;padding:0 22px" onclick="decide()">בדוק</button>
+        </div>
+        <div class="quick">
+          <div class="chip" onclick="quick('קפה ומאפה',34)">☕ קפה 34₪</div>
+          <div class="chip" onclick="quick('מסעדה',180)">🍽️ מסעדה 180₪</div>
+          <div class="chip" onclick="quick('נעליים',420)">👟 נעליים 420₪</div>
+          <div class="chip" onclick="quick('טלוויזיה חדשה',3200)">📺 טלוויזיה 3200₪</div>
+        </div>
+      </div>
+
+      <div id="verdictHost"></div>
+    </div>
+
+    <!-- ============ SUBSCRIPTIONS TAB ============ -->
+    <div class="tab" id="tab-subs">
+      <div class="card">
+        <div class="sec-title">🕵️ צייד המנויים והחיובים</div>
+        <p class="muted">מצאתי חיובים שכדאי שתבדוק. ביטול מנוי אחד = חיסכון של מאות שקלים בשנה.</p>
+        <ul class="sub-list" id="subsList"></ul>
+      </div>
+    </div>
+
+    <!-- ============ CHAT TAB ============ -->
+    <div class="tab" id="tab-chat">
+      <div class="card">
+        <div class="sec-title">💬 שאל אותי הכל על הכסף שלך</div>
+        <div class="chat" id="chatBox">
+          <div class="msg bot">היי אדיר 👋 אני העוזר הכלכלי שלך. שאל אותי משהו, למשל "כמה בזבזתי על אוכל החודש?"</div>
+        </div>
+        <div class="quick" style="justify-content:flex-start;margin-top:14px">
+          <div class="chip" onclick="chatAsk('כמה בזבזתי על אוכל החודש?')">אוכל החודש?</div>
+          <div class="chip" onclick="chatAsk('כמה נשאר לי עד סוף החודש?')">כמה נשאר?</div>
+          <div class="chip" onclick="chatAsk('איך אני חוסך לחופשה?')">חיסכון לחופשה</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ GOALS TAB ============ -->
+    <div class="tab" id="tab-goals">
+      <div class="card">
+        <div class="sec-title">🎯 אוטו-חיסכון חכם</div>
+        <p class="muted">בכל פעם שיש לך עודף — אני מזיז ממנו קצת הצידה בשקט. עד עכשיו חסכתי לך:</p>
+        <div class="big" style="font-size:34px;font-weight:800;margin:6px 0 2px">1,940 <small style="font-size:18px;color:var(--sub)">₪</small></div>
+        <div style="margin-top:16px">
+          <div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px"><span>✈️ חופשה ביוון</span><span class="muted">1,940 / 6,000 ₪</span></div>
+          <div style="height:12px;background:#0e1428;border-radius:8px;overflow:hidden;border:1px solid var(--line)"><div style="width:32%;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2))"></div></div>
+        </div>
+        <button class="btn ghost" onclick="toast('💡 קצב נוכחי: תגיע ליעד תוך כ-4 חודשים')">איך אני מתקדם?</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- wallet sheet -->
+  <div class="sheet-bg" id="sheet" onclick="if(event.target===this)closeSheet()">
+    <div class="sheet" id="sheetInner"></div>
+  </div>
+
+  <!-- bottom nav -->
+  <div class="nav">
+    <button class="on" data-tab="home" onclick="go('home',this)"><span class="ni">🏠</span>בית</button>
+    <button data-tab="subs" onclick="go('subs',this)"><span class="ni">🕵️</span>מנויים</button>
+    <button data-tab="chat" onclick="go('chat',this)"><span class="ni">💬</span>עוזר</button>
+    <button data-tab="goals" onclick="go('goals',this)"><span class="ni">🎯</span>חיסכון</button>
+  </div>
+</div>
+
+<script>
+/* ---------- מצב פיננסי מדומה של המשתמש ---------- */
+const state = {
+  balance: 8420,          // יתרה בחשבון
+  upcomingBills: 5270,    // חיובים קבועים שעוד יגיעו החודש (שכ"ד, הלוואה, מנויים...)
+  savingsGoalMonthly: 1000, // כמה הוא רוצה לחסוך החודש
+  daysLeftInMonth: 12,
+  cardLast4: '4417'
+};
+function reallyFree(){ return state.balance - state.upcomingBills - state.savingsGoalMonthly; }
+
+/* ---------- מנוע ההחלטה ---------- */
+function verdictFor(amount){
+  const free = reallyFree();
+  const afterPay = free - amount;
+  const dailySafe = Math.max(0, (state.balance - state.upcomingBills) / state.daysLeftInMonth);
+
+  if(amount <= 0 || isNaN(amount)) return null;
+
+  // ✅ כן — יש שפע
+  if(afterPay >= 300){
+    return {type:'yes', title:'כן, לך על זה 🎉', reasons:[
+      ['✅', `אחרי הקנייה יישארו לך <b>${nis(afterPay)}</b> פנויים החודש`],
+      ['🎯', `היעד חיסכון שלך (${nis(state.savingsGoalMonthly)}) עדיין מובטח`],
+      ['📅', `זה בערך ${(amount/Math.max(1,dailyBudget())).toFixed(1)} ימים מהתקציב היומי שלך — קל`]
+    ]};
+  }
+  // ⚠️ כן אבל — אפשרי אך על חשבון משהו
+  if(afterPay >= -200){
+    const delay = Math.ceil(Math.abs(afterPay-300)/500);
+    return {type:'maybe', title:'אפשר, אבל שים לב ⚠️', reasons:[
+      ['💸', `יישארו לך רק <b>${nis(Math.max(0,free-amount+state.savingsGoalMonthly))}</b> עד ה-1 לחודש`],
+      ['🎯', `זה ייגע בחיסכון לחופשה — היעד יידחה בכ-${1+delay} שבועות`],
+      ['💡', `אם תוותר על זה השבוע — תחזור לגמרי למסלול`]
+    ]};
+  }
+  // ❌ לא — מסוכן
+  return {type:'no', title:'עדיף לא עכשיו 🛑', reasons:[
+    ['🔴', `אתה עלול להיכנס למינוס — חסרים כ-<b>${nis(Math.abs(afterPay+state.savingsGoalMonthly))}</b>`],
+    ['📆', `יש לך חיובים קבועים של ${nis(state.upcomingBills)} שעוד לא ירדו`],
+    ['⏳', `חכה ${state.daysLeftInMonth} ימים למשכורת — ואז זה יהיה בטוח`]
+  ]};
+}
+function dailyBudget(){ return Math.max(1,(state.balance-state.upcomingBills)/state.daysLeftInMonth); }
+function nis(n){ return Math.round(n).toLocaleString('he-IL')+' ₪'; }
+
+let pending = null; // {what, amount}
+function decide(){
+  const amount = parseFloat(document.getElementById('amount').value);
+  const what = document.getElementById('what').value.trim() || 'הקנייה';
+  const v = verdictFor(amount);
+  const host = document.getElementById('verdictHost');
+  if(!v){ host.innerHTML=''; toast('כתוב סכום כדי שאבדוק 🙂'); return; }
+  pending = {what, amount};
+
+  const canPay = v.type !== 'no';
+  const reasons = v.reasons.map(r=>`<li><span class="ri">${r[0]}</span><span>${r[1]}</span></li>`).join('');
+  host.innerHTML = `
+    <div class="verdict ${v.type}">
+      <div class="head">
+        <div class="vicon">${v.type==='yes'?'😎':v.type==='maybe'?'🤨':'🛑'}</div>
+        <div>
+          <div class="ttl">${v.title}</div>
+          <div class="amtline">${what} · <b>${nis(amount)}</b></div>
+        </div>
+      </div>
+      <ul class="reasons">${reasons}</ul>
+      ${ canPay
+        ? `<button class="btn pay" onclick="openWallet()">כן, שלם ${nis(amount)} 💳</button>`
+        : `<button class="btn ghost" onclick="toast('כל הכבוד על האיפוק 💪 חסכת מעצמך כאב ראש')">הבנתי, אני מוותר בינתיים</button>`}
+    </div>`;
+  host.scrollIntoView({behavior:'smooth', block:'center'});
+}
+function quick(what,amt){ document.getElementById('what').value=what; document.getElementById('amount').value=amt; decide(); }
+
+/* ---------- ארנק דיגיטלי ---------- */
+function openWallet(){
+  if(!pending) return;
+  const {what, amount} = pending;
+  document.getElementById('sheetInner').innerHTML = `
+    <div class="grab"></div>
+    <div class="sec-title" style="margin-top:0">💳 אישור תשלום מהארנק</div>
+    <div class="wallet-card">
+      <div class="brand2">כדאי? Wallet · Visa</div>
+      <div class="num">•••• •••• •••• ${state.cardLast4}</div>
+      <div class="row"><span>אדיר ר.</span><span>יתרה: ${nis(state.balance)}</span></div>
+    </div>
+    <div class="pay-row"><span>${what}</span><span>${nis(amount)}</span></div>
+    <div class="pay-row"><span class="muted">עמלה</span><span class="muted">0 ₪</span></div>
+    <div class="pay-row total"><span>סה"כ לתשלום</span><span>${nis(amount)}</span></div>
+    <button class="btn pay" onclick="confirmPay()">אשר תשלום 🔒</button>
+    <button class="btn ghost" onclick="closeSheet()">ביטול</button>`;
+  document.getElementById('sheet').classList.add('on');
+}
+function confirmPay(){
+  const {what, amount} = pending;
+  state.balance -= amount;
+  document.getElementById('sheetInner').innerHTML = `
+    <div class="grab"></div>
+    <div class="success">
+      <div class="checkwrap"><div class="c">✓</div></div>
+      <div style="font-size:22px;font-weight:800">שולם בהצלחה!</div>
+      <div class="muted" style="margin-top:6px">${nis(amount)} עבור ${what}</div>
+      <div class="muted" style="margin-top:2px">יתרה חדשה: <b style="color:var(--txt)">${nis(state.balance)}</b></div>
+    </div>
+    <button class="btn" onclick="closeSheet(true)">סיום</button>`;
+  refresh();
+}
+function closeSheet(clear){
+  document.getElementById('sheet').classList.remove('on');
+  if(clear){ document.getElementById('verdictHost').innerHTML=''; document.getElementById('amount').value=''; document.getElementById('what').value=''; pending=null; }
+}
+function refresh(){
+  document.getElementById('balance').innerHTML = Math.round(state.balance).toLocaleString('he-IL')+'<small> ₪</small>';
+  document.getElementById('reallyFree').textContent = nis(Math.max(0,reallyFree())+state.savingsGoalMonthly);
+}
+
+/* ---------- מנויים ---------- */
+const subs = [
+  {ic:'🎬',name:'Netflix Premium',meta:'מנוי חודשי · חויב אתמול',price:'69.90 ₪',flag:'עלה ב-14% מאז השנה שעברה'},
+  {ic:'🎵',name:'Spotify',meta:'מנוי חודשי',price:'19.90 ₪',flag:null},
+  {ic:'🏋️',name:'מכון כושר "פיט"',meta:'לא נכנסת כבר 3 חודשים',price:'229 ₪',flag:'שילמת 687₪ בלי להשתמש'},
+  {ic:'☁️',name:'iCloud 200GB',meta:'מנוי חודשי',price:'11.90 ₪',flag:null},
+  {ic:'📺',name:'Disney+',meta:'תקופת ניסיון נגמרת מחר!',price:'34.90 ₪',flag:'יתחדש אוטומטית — בטל אם לא בשימוש'},
+  {ic:'📰',name:'עיתון דיגיטלי',meta:'חיוב כפול זוהה החודש',price:'2 × 44 ₪',flag:'זיהיתי חיוב כפול — נטפל בזה'}
+];
+function renderSubs(){
+  document.getElementById('subsList').innerHTML = subs.map((s,i)=>`
+    <li class="sub-item">
+      <div class="sub-ic">${s.ic}</div>
+      <div>
+        <div class="sub-name">${s.name}</div>
+        <div class="sub-meta">${s.meta}</div>
+        ${s.flag?`<span class="flag">⚠️ ${s.flag}</span>`:''}
+      </div>
+      <div class="sub-price">${s.price}<br><button class="kill" onclick="killSub(${i},this)">בטל</button></div>
+    </li>`).join('');
+}
+function killSub(i,btn){
+  btn.textContent='בוטל ✓'; btn.style.opacity=.6; btn.disabled=true;
+  toast(`ביטלתי את "${subs[i].name}" — חיסכון שנתי בדרך 💰`);
+}
+
+/* ---------- צ'אט ---------- */
+function chatAsk(q){
+  const box=document.getElementById('chatBox');
+  box.insertAdjacentHTML('beforeend',`<div class="msg me">${q}</div>`);
+  const ans = answer(q);
+  setTimeout(()=>{ box.insertAdjacentHTML('beforeend',`<div class="msg bot">${ans}</div>`); box.scrollTop=box.scrollHeight; },350);
+  box.scrollTop=box.scrollHeight;
+}
+function answer(q){
+  if(q.includes('אוכל')) return '🍔 החודש בזבזת <b>1,240 ₪</b> על אוכל בחוץ — 18% יותר מהרגיל. רוב זה במשלוחים בסופ"ש. אם תקצץ ב-2 משלוחים תחסוך ~300₪.';
+  if(q.includes('נשאר')) return `💰 באמת פנוי לך <b>${nis(Math.max(0,reallyFree())+state.savingsGoalMonthly)}</b> עד סוף החודש, אחרי כל החיובים הקבועים. זה כ-${nis(dailyBudget())} ליום.`;
+  if(q.includes('חופשה')) return '✈️ כדי להגיע ל-6,000₪ לחופשה תוך 4 חודשים, אני צריך להזיז ~1,000₪ בחודש. יש לך מקום לזה — אפעיל אוטו-חיסכון?';
+  return 'שאלה טובה! בגרסה המלאה אני מתחבר לחשבון הבנק שלך ועונה על הכל בזמן אמת 😊';
+}
+
+/* ---------- ניווט + טוסט ---------- */
+function go(tab,btn){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.getElementById('tab-'+tab).classList.add('on');
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.querySelector('.screen').scrollTop=0;
+}
+let toastT;
+function toast(msg){
+  const t=document.getElementById('toast'); t.innerHTML='💬 '+msg; t.classList.add('on');
+  clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('on'),2600);
+}
+
+renderSubs(); refresh();
+document.getElementById('amount').addEventListener('keydown',e=>{ if(e.key==='Enter')decide(); });
+</script>
+</body>
+</html>
