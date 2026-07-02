@@ -1,5 +1,5 @@
 /* אוצר — service worker (offline-first shell) */
-const CACHE = 'otzar-v1';
+const CACHE = 'otzar-v2';
 const ASSETS = ['./', './index.html', './manifest.json', './icon.svg'];
 
 self.addEventListener('install', e => {
