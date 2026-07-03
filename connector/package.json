@@ -1,0 +1,19 @@
+{
+  "name": "otzar-connector",
+  "version": "1.0.0",
+  "private": true,
+  "description": "אוצר — מחבר בנק מקומי: מושך תנועות אמיתיות מהחשבון שלך ומגיש את האפליקציה. הכל רץ על המחשב שלך.",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "postinstall": "node -e \"console.log('\\n✅ ההתקנה הושלמה. הרץ: npm start\\n')\""
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "israeli-bank-scrapers": "^6.7.9"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
