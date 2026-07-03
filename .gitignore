@@ -1,0 +1,5 @@
+# test / preview artifacts
+preview-*.png
+*.log
+# local deps
+node_modules/
