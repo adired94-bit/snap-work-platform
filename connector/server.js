@@ -38,7 +38,7 @@ app.get('/api/health', (_req, res) => {
  * מחזיר: { provider, accounts: [{ accountNumber, balance, kind, txns: [{date, desc, amt, memo, status}] }] }
  */
 app.post('/api/scrape', async (req, res) => {
-  const { provider, credentials, months } = req.body || {};
+  const { provider, credentials, months, showBrowser } = req.body || {};
   if (!provider || !credentials) {
     return res.status(400).json({ error: 'missing_params', message: 'חסר provider או credentials' });
   }
@@ -58,8 +58,8 @@ app.post('/api/scrape', async (req, res) => {
     companyId,
     startDate,
     combineInstallments: false,
-    showBrowser: process.env.SHOW_BROWSER === '1',
-    defaultTimeout: 120000,
+    showBrowser: showBrowser === true || process.env.SHOW_BROWSER === '1',
+    defaultTimeout: 180000,
   });
 
   try {

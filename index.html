@@ -1061,6 +1061,8 @@ function openLiveConnect(prov){
     <div class="field col"><label>בנק / כרטיס</label>
       <select id="lcProvider" onchange="openLiveConnect(this.value)">${provOpts}</select></div>
     ${fields}
+    <label style="display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--sub);margin:2px 0 12px;cursor:pointer">
+      <input type="checkbox" id="lcShow" checked style="width:18px;height:18px;flex:0 0 auto"> פתח חלון להזנת קוד אימות (SMS) — מומלץ לפועלים</label>
     <button class="btn" id="lcBtn" onclick="doLiveConnect('${p.id}')">התחבר ומשוך תנועות</button>
     <div id="lcStatus" class="muted" style="margin-top:12px;text-align:center"></div>
     <div class="card" style="margin-top:14px;padding:13px 15px;background:rgba(94,201,138,.06);border-color:rgba(94,201,138,.25)">
@@ -1081,8 +1083,10 @@ async function doLiveConnect(provId){
   btn.disabled=true;btn.textContent='מתחבר… זה יכול לקחת עד דקה';
   st.innerHTML='<span class="typing"><span></span><span></span><span></span></span> מתחבר ל'+p.name+' ומושך תנועות';
   try{
+    const showBrowser=!document.getElementById('lcShow')||document.getElementById('lcShow').checked;
+    if(showBrowser)st.innerHTML='<span class="typing"><span></span><span></span><span></span></span> נפתח חלון דפדפן — עקוב אחריו והזן שם את קוד ה-SMS';
     const r=await fetch(connBase()+'/api/scrape',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({provider:p.id,credentials:creds,months:3})});
+      body:JSON.stringify({provider:p.id,credentials:creds,months:3,showBrowser})});
     const data=await r.json();
     if(!r.ok||data.error)throw new Error(data.message||'ההתחברות נכשלה');
     liveSession={provider:p.id,credentials:creds};
