@@ -385,6 +385,11 @@
         <div class="mt"><b id="monthName">יולי 2026</b><div id="monthSpend">—</div></div>
         <div class="mnav" onclick="toast('דמו: החודש הנוכחי')"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></div>
       </div>
+      <div class="card tap" onclick="openImport()" style="display:flex;align-items:center;gap:12px;border-color:rgba(201,168,106,.3)">
+        <div class="aicon"><svg viewBox="0 0 24 24" style="stroke:var(--gold2);fill:none;stroke-width:1.6;width:21px;height:21px"><path d="M10 13a5 5 0 0 0 7 0l2-2a5 5 0 0 0-7-7l-1 1M14 11a5 5 0 0 0-7 0l-2 2a5 5 0 0 0 7 7l1-1"/></svg></div>
+        <div style="flex:1"><div class="aname">חבר את הבנק שלך</div><div class="ameta">ייבא דף תנועות אמיתי (CSV / אקסל)</div></div>
+        <svg class="chev" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>
+      </div>
       <div class="card">
         <div class="sec-head" style="margin:0 0 10px"><h3 style="font-size:14px">לפי קטגוריה</h3><a onclick="toast('הקטגוריות נלמדות אוטומטית ומשתפרות עם כל תיקון שלך')">איך זה עובד?</a></div>
         <div id="catBreak"></div>
@@ -830,7 +835,8 @@ function openAccounts(){
     <div class="muted" style="font-size:11px">רענון אחרון לפני 12 דקות · אוטומטי 4× ביום</div></div></div></div>`;
   groups.forEach(g=>{const items=store.accounts.filter(a=>a.group===g);if(!items.length)return;
     html+=`<div class="sec-head" style="margin-top:10px"><h3 style="font-size:14px">${g}</h3></div><div class="card">${items.map(accRow).join('')}</div>`;});
-  html+=`<button class="btn ghost" onclick="openAccountForm()">+ הוסף חשבון ידני (גיבוי)</button>
+  html+=`<button class="btn" onclick="openImport()">ייבא דף תנועות אמיתי מהבנק</button>
+    <button class="btn ghost" style="margin-top:9px" onclick="openAccountForm()">+ הוסף חשבון ידני (גיבוי)</button>
     <button class="btn ghost" style="margin-top:9px" onclick="closeSheet()">סגור</button>`;
   setSheet(html);
 }
@@ -909,6 +915,81 @@ function cancelSub(id){const s=store.subs.find(x=>x.id===id);delSub(id);
     <div class="muted" style="margin-top:2px">נעקוב אחרי החיוב ונוודא שבאמת פסק.</div></div>
     <button class="btn" style="margin-top:14px" onclick="openSubs()">חזרה למנויים</button>`);}
 function delSub(id){store.subs=store.subs.filter(s=>s.id!==id);renderAll();}
+
+/* ============ REAL BANK IMPORT (CSV) ============ */
+const CATRULES=[
+  ['הכנסה',/משכורת|שכר|העברה נכנס|זיכוי|החזר|קצבה|מלגה|הפקדה/],
+  ['מזון',/שופרסל|רמי לוי|רמי-לוי|מגה|ויקטורי|טיב טעם|יינות ביתן|אושר עד|יוחננוף|סופר|מכולת|am:pm|ampm/i],
+  ['מסעדות',/wolt|וולט|מקדונ|בורגר|ארומה|קפה|רסטו|מסעד|פיצה|דומינו|קפולסקי|לנדוור|תן ביס|10bis|cibus|סיבוס/i],
+  ['דלק',/פז|סונול|דלק|דור אלון|delek|paz|sonol|ten|תחנת דלק/i],
+  ['תחבורה',/רב.?קו|rav.?kav|אגד|דן|מטרופולין|רכבת|מטרו|חניון|פנגו|pango|cellopark|uber|gett|bolt|יקנעם/i],
+  ['חשבונות',/חשמל|בזק|bezeq|hot|yes|סלקום|cellcom|partner|פרטנר|פלאפון|pelephone|golan|רמי|מים|ארנונה|עיריי|גז/i],
+  ['בריאות',/סופר.?פארם|super.?pharm|be pharm|כללית|מכבי|clalit|maccabi|בית מרקחת|רופא|מרפא|ניו פארם/i],
+  ['קניות',/amazon|אמזון|aliexpress|עלי|ebay|קסטרו|castro|zara|זארה|fox|גולף|ikea|איקאה|נעל|בגד|טרמינל|shein|next/i],
+  ['בילויים',/netflix|נטפליקס|spotify|disney|youtube|cinema|סינמה|yes planet|הופעה|תיאטרון|בית קולנוע/i],
+  ['מנויים',/icloud|apple\.com|google|chatgpt|openai|microsoft|adobe|dropbox|linkedin|notion|מנוי/i],
+  ['חינוך',/סטימצקי|צומת ספרים|book|קורס|אונ?יברסי|מכללה|לימוד|גן |בית ספר|צהרון/i],
+];
+function autoCat(desc,amt){if(amt>0&&/משכורת|שכר|זיכוי|החזר|העברה|הפקדה|קצבה/.test(desc))return'הכנסה';
+  for(const[c,re]of CATRULES)if(re.test(desc))return c;return amt>0?'הכנסה':'אחר';}
+const CATLOGO={'מזון':'🛒','מסעדות':'🍔','דלק':'⛽','תחבורה':'🚌','חשבונות':'🧾','בריאות':'💊','קניות':'🛍️','בילויים':'🎬','מנויים':'📱','חינוך':'📚','הכנסה':'💼','אחר':'💳'};
+function openImport(){
+  const opts=store.accounts.filter(a=>!a.monthly).map(a=>`<option value="${a.id}">${a.name}</option>`).join('');
+  setSheet(`<div class="eyebrow2">חבר את הבנק שלך · ייבוא תנועות</div>
+    <div class="muted" style="margin-top:0;line-height:1.6">חיבור אוטומטי לבנק דורש רישיון אגרגציה (בדרך). בינתיים — הורד דף תנועות מאתר הבנק/כרטיס האשראי (ייצוא ל-CSV או Excel שמור כ-CSV), ואייבא אותו לכאן. אזהה הכנסות והוצאות, אסווג לקטגוריות ואעדכן את היתרה.</div>
+    ${store.accounts.filter(a=>!a.monthly).length?`
+      <div class="field col" style="margin-top:14px"><label>שייך לחשבון</label><select id="impAcc">${opts}</select></div>
+      <div class="field col"><label>קובץ תנועות (CSV)</label><input type="file" id="impFile" accept=".csv,text/csv,text/plain"></div>
+      <button class="btn" onclick="runImport()">ייבא וסווג</button>`
+      :`<div class="muted" style="margin-top:14px">קודם הוסף חשבון אחד לפחות.</div>`}
+    <div class="muted" style="font-size:11px;margin-top:12px">🔒 הקובץ מעובד במכשיר שלך בלבד — לא נשלח לשום שרת.</div>
+    <button class="btn ghost" style="margin-top:10px" onclick="closeSheet()">סגור</button>`);
+}
+function runImport(){
+  const accId=+document.getElementById('impAcc').value;const f=document.getElementById('impFile').files[0];
+  if(!f)return toast('בחר קובץ CSV');
+  const r=new FileReader();
+  r.onload=()=>{const acc=store.accounts.find(a=>a.id===accId);const parsed=parseCSV(r.result);
+    if(!parsed.length)return toast('לא זוהו תנועות בקובץ. נסה ייצוא CSV מהבנק.');
+    parsed.forEach(t=>{t.cat=autoCat(t.desc,t.amt);t.logo=CATLOGO[t.cat];t.day=0;});
+    store.txns=parsed.concat(store.txns);const sum=parsed.reduce((s,t)=>s+t.amt,0);if(acc)acc.balance+=sum;
+    save();closeSheet();renderAll();animateWorth();go('tx',document.querySelectorAll('.nav button')[1]);
+    toast(`יובאו ${parsed.length} תנועות · שינוי נטו ${nis(sum)} · סווגו אוטומטית`);};
+  r.readAsText(f,'utf-8');
+}
+function parseCSV(text){
+  const rows=text.split(/\r?\n/).filter(l=>l.trim()).map(l=>l.split(/[,;\t]/).map(c=>c.replace(/^"|"$/g,'').trim()));
+  const num=c=>{const n=parseFloat((c||'').replace(/[^\d.\-]/g,''));return isNaN(n)?null:n;};
+  // find a header row that names the columns (covers Leumi/Cal/Max/Isracard/Hapoalim exports)
+  let hi=-1;for(let i=0;i<Math.min(rows.length,4);i++){const j=rows[i].join(' ');
+    if(/תארי|תיאור|תאור|פרטים|חובה|זכות|יתרה|סכום|בית עסק/.test(j)){hi=i;break;}}
+  const out=[];
+  if(hi>=0){
+    const h=rows[hi];const find=re=>h.findIndex(c=>re.test(c));
+    const iDesc=find(/תיאור|תאור|פרטים|שם בית|בית עסק|פעולה|תנועה/),
+      iDeb=find(/חובה|חיוב|הוצאה|debit/i),iCred=find(/זכות|זיכוי|הכנסה|credit/i),
+      iAmt=find(/סכום|סך|amount|₪/i),iBal=find(/יתרה|balance/i);
+    for(let i=hi+1;i<rows.length;i++){const cells=rows[i];if(!cells.length)continue;
+      let desc=iDesc>=0?cells[iDesc]:'';
+      if(!desc){desc=cells.find(c=>c&&!/^[\d.,\-\/\s₪%]+$/.test(c))||'';}
+      let amt=null;
+      if(iDeb>=0||iCred>=0){const d=Math.abs(num(cells[iDeb])||0),c=num(cells[iCred])||0;amt=c-d;}
+      else if(iAmt>=0){amt=num(cells[iAmt]);}
+      if(amt==null){ // last resort: first numeric cell that isn't the balance column
+        for(let k=0;k<cells.length;k++){if(k===iBal)continue;const n=num(cells[k]);if(n!=null&&Math.abs(n)>=0.5&&!/^\d{1,2}[\/.]\d/.test(cells[k])){amt=n;break;}}}
+      if(amt!=null&&Math.abs(amt)>=0.5&&desc)out.push({id:++uid,desc:desc.slice(0,40),amt});
+    }
+  } else {
+    // headerless: take longest text as desc, FIRST numeric (not a date, not last=balance) as amount
+    for(const cells of rows){let desc='',amt=null;
+      const nums=[];cells.forEach((c,k)=>{const n=num(c);if(n!=null&&Math.abs(n)>=0.5&&Math.abs(n)<1e7&&!/^\d{1,2}[\/.]\d/.test(c))nums.push({n,k});
+        if(c&&!/^[\d.,\-\/\s₪%]+$/.test(c)&&c.length>desc.length)desc=c;});
+      if(nums.length){amt=(nums.length>1?nums.slice(0,-1):nums)[0].n;} // drop trailing balance when >1 number
+      if(amt!=null&&desc)out.push({id:++uid,desc:desc.slice(0,40),amt});
+    }
+  }
+  return out;
+}
 
 /* ============ DEBTS SHEET ============ */
 function openDebts(){
