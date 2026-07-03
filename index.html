@@ -10,6 +10,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="אוצר">
 <title>אוצר · הבנק הפרטי שלך</title>
+<script src="vendor/pdf.min.js"></script>
 <style>
   :root{
     --bg:#080b12; --panel:#0f1420; --panel2:#141a29; --line:#1f2740;
@@ -922,24 +923,26 @@ const CATRULES=[
   ['מזון',/שופרסל|רמי לוי|רמי-לוי|מגה|ויקטורי|טיב טעם|יינות ביתן|אושר עד|יוחננוף|סופר|מכולת|am:pm|ampm/i],
   ['מסעדות',/wolt|וולט|מקדונ|בורגר|ארומה|קפה|רסטו|מסעד|פיצה|דומינו|קפולסקי|לנדוור|תן ביס|10bis|cibus|סיבוס/i],
   ['דלק',/פז|סונול|דלק|דור אלון|delek|paz|sonol|ten|תחנת דלק/i],
-  ['תחבורה',/רב.?קו|rav.?kav|אגד|דן|מטרופולין|רכבת|מטרו|חניון|פנגו|pango|cellopark|uber|gett|bolt|יקנעם/i],
-  ['חשבונות',/חשמל|בזק|bezeq|hot|yes|סלקום|cellcom|partner|פרטנר|פלאפון|pelephone|golan|רמי|מים|ארנונה|עיריי|גז/i],
-  ['בריאות',/סופר.?פארם|super.?pharm|be pharm|כללית|מכבי|clalit|maccabi|בית מרקחת|רופא|מרפא|ניו פארם/i],
+  ['תחבורה',/רב.?קו|rav.?kav|אגד|דן|מטרופולין|רכבת|מטרו|חניון|פנגו|pango|cellopark|uber|gett|bolt|יקנעם|לרכב|פמה אשראי|אמפא/i],
+  ['חשבונות',/חשמל|בזק|bezeq|hot|yes|סלקום|cellcom|partner|פרטנר|פלאפון|pelephone|golan|מים|ארנונה|עיריי|גז|הלואה|הלו'|משכנתא|הו"?ק/i],
+  ['בריאות',/סופר.?פארם|super.?pharm|be pharm|כללית|מכבי|clalit|maccabi|בית מרקחת|רופא|מרפא|ניו פארם|שירותי בריאות|מגן דוד/i],
   ['קניות',/amazon|אמזון|aliexpress|עלי|ebay|קסטרו|castro|zara|זארה|fox|גולף|ikea|איקאה|נעל|בגד|טרמינל|shein|next/i],
   ['בילויים',/netflix|נטפליקס|spotify|disney|youtube|cinema|סינמה|yes planet|הופעה|תיאטרון|בית קולנוע/i],
   ['מנויים',/icloud|apple\.com|google|chatgpt|openai|microsoft|adobe|dropbox|linkedin|notion|מנוי/i],
   ['חינוך',/סטימצקי|צומת ספרים|book|קורס|אונ?יברסי|מכללה|לימוד|גן |בית ספר|צהרון/i],
 ];
-function autoCat(desc,amt){if(amt>0&&/משכורת|שכר|זיכוי|החזר|העברה|הפקדה|קצבה/.test(desc))return'הכנסה';
-  for(const[c,re]of CATRULES)if(re.test(desc))return c;return amt>0?'הכנסה':'אחר';}
+function autoCat(desc,amt){
+  if(amt>0&&/משכורת|שכר|זיכוי|החזר|העברה|הפקדה|קצבה|ריבית|פדיון|מכירה/.test(desc))return'הכנסה';
+  for(const[c,re]of CATRULES){if(c==='הכנסה')continue;if(re.test(desc))return c;}
+  return amt>0?'הכנסה':'אחר';}
 const CATLOGO={'מזון':'🛒','מסעדות':'🍔','דלק':'⛽','תחבורה':'🚌','חשבונות':'🧾','בריאות':'💊','קניות':'🛍️','בילויים':'🎬','מנויים':'📱','חינוך':'📚','הכנסה':'💼','אחר':'💳'};
 function openImport(){
   const opts=store.accounts.filter(a=>!a.monthly).map(a=>`<option value="${a.id}">${a.name}</option>`).join('');
   setSheet(`<div class="eyebrow2">חבר את הבנק שלך · ייבוא תנועות</div>
-    <div class="muted" style="margin-top:0;line-height:1.6">חיבור אוטומטי לבנק דורש רישיון אגרגציה (בדרך). בינתיים — הורד דף תנועות מאתר הבנק/כרטיס האשראי (ייצוא ל-CSV או Excel שמור כ-CSV), ואייבא אותו לכאן. אזהה הכנסות והוצאות, אסווג לקטגוריות ואעדכן את היתרה.</div>
+    <div class="muted" style="margin-top:0;line-height:1.6">חיבור אוטומטי לבנק דורש רישיון אגרגציה (בדרך). בינתיים — הורד דף תנועות מאתר הבנק/כרטיס האשראי (PDF, CSV או Excel), ואייבא אותו לכאן. אזהה הכנסות והוצאות, אסווג לקטגוריות ואעדכן את היתרה. תומך בדף חשבון PDF של בנק הפועלים ובנקים נוספים.</div>
     ${store.accounts.filter(a=>!a.monthly).length?`
       <div class="field col" style="margin-top:14px"><label>שייך לחשבון</label><select id="impAcc">${opts}</select></div>
-      <div class="field col"><label>קובץ תנועות (CSV)</label><input type="file" id="impFile" accept=".csv,text/csv,text/plain"></div>
+      <div class="field col"><label>דף תנועות (PDF / CSV)</label><input type="file" id="impFile" accept=".pdf,application/pdf,.csv,text/csv,text/plain"></div>
       <button class="btn" onclick="runImport()">ייבא וסווג</button>`
       :`<div class="muted" style="margin-top:14px">קודם הוסף חשבון אחד לפחות.</div>`}
     <div class="muted" style="font-size:11px;margin-top:12px">🔒 הקובץ מעובד במכשיר שלך בלבד — לא נשלח לשום שרת.</div>
@@ -947,15 +950,50 @@ function openImport(){
 }
 function runImport(){
   const accId=+document.getElementById('impAcc').value;const f=document.getElementById('impFile').files[0];
-  if(!f)return toast('בחר קובץ CSV');
-  const r=new FileReader();
-  r.onload=()=>{const acc=store.accounts.find(a=>a.id===accId);const parsed=parseCSV(r.result);
-    if(!parsed.length)return toast('לא זוהו תנועות בקובץ. נסה ייצוא CSV מהבנק.');
+  if(!f)return toast('בחר קובץ PDF או CSV');
+  const acc=store.accounts.find(a=>a.id===accId);
+  const done=(parsed,latestBal)=>{
+    if(!parsed.length)return toast('לא זוהו תנועות בקובץ. נסה ייצוא אחר מהבנק.');
     parsed.forEach(t=>{t.cat=autoCat(t.desc,t.amt);t.logo=CATLOGO[t.cat];t.day=0;});
-    store.txns=parsed.concat(store.txns);const sum=parsed.reduce((s,t)=>s+t.amt,0);if(acc)acc.balance+=sum;
+    store.txns=parsed.concat(store.txns);const sum=parsed.reduce((s,t)=>s+t.amt,0);
+    if(acc){if(latestBal!=null)acc.balance=latestBal;else acc.balance+=sum;acc.connected=true;}
     save();closeSheet();renderAll();animateWorth();go('tx',document.querySelectorAll('.nav button')[1]);
-    toast(`יובאו ${parsed.length} תנועות · שינוי נטו ${nis(sum)} · סווגו אוטומטית`);};
-  r.readAsText(f,'utf-8');
+    toast(`יובאו ${parsed.length} תנועות · סווגו אוטומטית${latestBal!=null?' · יתרה עודכנה':''}`);
+  };
+  if(/\.pdf$/i.test(f.name)||f.type==='application/pdf'){
+    toast('קורא את דף החשבון…');
+    parsePDFStatement(f).then(res=>done(res.txns,res.latestBal)).catch(e=>toast('לא הצלחתי לקרוא את ה-PDF. ודא שזה דף תנועות ולא צילום/סרוק.'));
+  }else{
+    const r=new FileReader();r.onload=()=>done(parseCSV(r.result),null);r.readAsText(f,'utf-8');
+  }
+}
+/* Bank-statement PDF parser (positional rows + balance-delta signing). Tuned for Bank Hapoalim, tolerant of similar layouts. */
+async function parsePDFStatement(file){
+  if(typeof pdfjsLib==='undefined')throw new Error('pdf engine missing');
+  pdfjsLib.GlobalWorkerOptions.workerSrc='vendor/pdf.worker.min.js';
+  const buf=await file.arrayBuffer();
+  const pdf=await pdfjsLib.getDocument({data:buf}).promise;
+  const rows=[];
+  for(let pg=1;pg<=pdf.numPages;pg++){
+    const page=await pdf.getPage(pg);const tc=await page.getTextContent();
+    const items=tc.items.map(it=>({s:(it.str||'').trim(),x:it.transform[4],y:it.transform[5]})).filter(it=>it.s);
+    const groups=[];
+    items.forEach(it=>{let g=groups.find(g=>Math.abs(g.y-it.y)<5);if(!g){g={y:it.y,items:[]};groups.push(g);}g.items.push(it);});
+    groups.forEach(g=>{
+      const dateItem=g.items.find(it=>/^\d{2}\/\d{2}\/\d{4}$/.test(it.s)&&it.x>500);
+      const balStr=g.items.filter(it=>it.x<150).map(it=>it.s).find(s=>/^₪?-?[\d,]*\.\d{2}$/.test(s));
+      if(!dateItem||balStr==null)return;
+      const bal=parseFloat(balStr.replace(/[₪,]/g,''));if(isNaN(bal))return;
+      const desc=g.items.filter(it=>it.x>375&&it.x<515&&!/^\d{2}\/\d{2}\/\d{4}$/.test(it.s)&&!/^[₪\d,.\-]+$/.test(it.s))
+        .sort((a,b)=>b.x-a.x).map(it=>it.s).join(' ').replace(/\s+/g,' ').trim();
+      rows.push({desc:desc||'תנועה',bal,pg,y:g.y});
+    });
+  }
+  rows.sort((a,b)=>a.pg-b.pg||b.y-a.y); // newest → oldest
+  const txns=[];
+  for(let i=0;i<rows.length-1;i++){const amt=Math.round((rows[i].bal-rows[i+1].bal)*100)/100;
+    if(Math.abs(amt)>=0.01)txns.push({id:++uid,desc:rows[i].desc.slice(0,40),amt});}
+  return {txns,latestBal:rows.length?rows[0].bal:null};
 }
 function parseCSV(text){
   const rows=text.split(/\r?\n/).filter(l=>l.trim()).map(l=>l.split(/[,;\t]/).map(c=>c.replace(/^"|"$/g,'').trim()));
