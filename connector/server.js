@@ -53,12 +53,13 @@ app.post('/api/scrape', async (req, res) => {
   const CARD_PROVIDERS = ['visaCal', 'max', 'isracard', 'amex'];
   const kind = CARD_PROVIDERS.includes(provider) ? 'card' : 'bank';
 
+  // SHOW_BROWSER=1 מריץ עם חלון דפדפן גלוי — שימושי לאבחון (רואים בדיוק מה הבנק מציג)
   const scraper = createScraper({
     companyId,
     startDate,
     combineInstallments: false,
-    showBrowser: false,
-    defaultTimeout: 80000,
+    showBrowser: process.env.SHOW_BROWSER === '1',
+    defaultTimeout: 120000,
   });
 
   try {

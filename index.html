@@ -1091,8 +1091,16 @@ async function doLiveConnect(provId){
     liveSuccessSheet(p,n);
   }catch(e){
     btn.disabled=false;btn.textContent='נסה שוב';
-    const noConn=/Failed to fetch|NetworkError|load failed/i.test(e.message);
-    st.innerHTML=`<span style="color:var(--red)">${noConn?'לא נמצא המחבר המקומי. ודא ש-<b>npm start</b> רץ בתיקיית connector, ופתח את האפליקציה מ-http://localhost:8788':e.message}</span>`;
+    const m=e.message||'';
+    let hint;
+    if(/Failed to fetch|NetworkError|load failed/i.test(m))
+      hint='לא נמצא המחבר המקומי. ודא ש-<b>npm start</b> רץ בתיקיית connector, ופתח את האפליקציה מ-http://localhost:8788';
+    else if(/redirect|timeout|timed out|נכשל/i.test(m))
+      hint='ההתחברות לא הושלמה. ברוב המקרים זה קוד משתמש/סיסמה לא מדויקים, או שהבנק ביקש אימות נוסף. בדוק את הפרטים ונסה שוב · לאבחון: הרץ עם SHOW_BROWSER=1 כדי לראות את דף הבנק.';
+    else if(/INVALID_PASSWORD|password|credentials/i.test(m))
+      hint='קוד משתמש או סיסמה שגויים. בדוק שוב — בדיוק כמו שאתה מתחבר באתר הבנק.';
+    else hint=m;
+    st.innerHTML=`<span style="color:var(--red)">${hint}</span>`;
   }
 }
 function applyScraped(p,data){
