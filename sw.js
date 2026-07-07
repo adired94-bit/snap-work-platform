@@ -5,7 +5,7 @@
  * so cloud data, real-time sync and multi-device updates behave EXACTLY
  * as before — every data request always goes live to the network.
  */
-const CACHE = 'tavura-v1';
+const CACHE = 'tavura-v2';
 const SHELL = ['./', './index.html', './manifest.json', './icon.svg',
                './icon-192.png', './icon-512.png', './icon-512-maskable.png'];
 
