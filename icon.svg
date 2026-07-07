@@ -1,13 +1,54 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#1c2338"/><stop offset="1" stop-color="#0b0f19"/>
+      <stop offset="0" stop-color="#1a3a08"/>
+      <stop offset="1" stop-color="#4a7c26"/>
     </linearGradient>
-    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#e7d6ac"/><stop offset="1" stop-color="#c9a86a"/>
+    <linearGradient id="body" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffd24a"/>
+      <stop offset="1" stop-color="#f1a91e"/>
+    </linearGradient>
+    <linearGradient id="ground" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7ab648"/>
+      <stop offset="1" stop-color="#5a8a30"/>
     </linearGradient>
   </defs>
+
+  <!-- background -->
   <rect width="512" height="512" rx="112" fill="url(#bg)"/>
-  <rect x="14" y="14" width="484" height="484" rx="100" fill="none" stroke="#c9a86a" stroke-opacity="0.4" stroke-width="4"/>
-  <text x="256" y="256" font-family="Georgia, 'Times New Roman', serif" font-size="300" fill="url(#gold)" text-anchor="middle" dominant-baseline="central">א</text>
+  <rect x="16" y="16" width="480" height="480" rx="98" fill="none" stroke="#7ab648" stroke-opacity="0.35" stroke-width="5"/>
+
+  <!-- ground mound -->
+  <path d="M40 372 Q150 330 256 356 Q380 386 472 356 L472 420 Q380 448 256 430 Q150 414 40 432 Z" fill="url(#ground)" opacity="0.9"/>
+
+  <!-- dump truck (articulated hauler) -->
+  <g transform="translate(0,4)">
+    <!-- tipper bed with earth load -->
+    <path d="M238 250 L470 250 L440 336 L238 336 Z" fill="url(#body)" stroke="#7a4d00" stroke-width="6" stroke-linejoin="round"/>
+    <!-- earth pile in bed -->
+    <path d="M250 250 Q300 214 348 240 Q392 216 452 250 Z" fill="#6b4a24" stroke="#4d3418" stroke-width="4" stroke-linejoin="round"/>
+    <circle cx="300" cy="240" r="9" fill="#7a5730"/>
+    <circle cx="360" cy="236" r="7" fill="#7a5730"/>
+    <circle cx="410" cy="244" r="8" fill="#7a5730"/>
+
+    <!-- cab -->
+    <path d="M120 244 L214 244 L214 336 L92 336 L92 300 Q92 286 106 282 L150 272 Z" fill="url(#body)" stroke="#7a4d00" stroke-width="6" stroke-linejoin="round"/>
+    <!-- window -->
+    <path d="M132 260 L200 260 L200 296 L132 296 Z" fill="#2d5016" opacity="0.85"/>
+
+    <!-- chassis -->
+    <rect x="92" y="336" width="360" height="14" rx="6" fill="#3a2a10"/>
+
+    <!-- wheels -->
+    <g fill="#20140a">
+      <circle cx="158" cy="362" r="40"/>
+      <circle cx="330" cy="362" r="40"/>
+      <circle cx="410" cy="362" r="40"/>
+    </g>
+    <g fill="#c9c9c9">
+      <circle cx="158" cy="362" r="16"/>
+      <circle cx="330" cy="362" r="16"/>
+      <circle cx="410" cy="362" r="16"/>
+    </g>
+  </g>
 </svg>
