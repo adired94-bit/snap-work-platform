@@ -18,37 +18,37 @@
   <rect width="512" height="512" rx="112" fill="url(#bg)"/>
   <rect x="16" y="16" width="480" height="480" rx="98" fill="none" stroke="#7ab648" stroke-opacity="0.35" stroke-width="5"/>
 
-  <!-- ground mound -->
-  <path d="M40 372 Q150 330 256 356 Q380 386 472 356 L472 420 Q380 448 256 430 Q150 414 40 432 Z" fill="url(#ground)" opacity="0.9"/>
-
-  <!-- dump truck (articulated hauler) -->
-  <g transform="translate(0,4)">
-    <!-- tipper bed with earth load -->
-    <path d="M238 250 L470 250 L440 336 L238 336 Z" fill="url(#body)" stroke="#7a4d00" stroke-width="6" stroke-linejoin="round"/>
-    <!-- earth pile in bed -->
-    <path d="M250 250 Q300 214 348 240 Q392 216 452 250 Z" fill="#6b4a24" stroke="#4d3418" stroke-width="4" stroke-linejoin="round"/>
-    <circle cx="300" cy="240" r="9" fill="#7a5730"/>
-    <circle cx="360" cy="236" r="7" fill="#7a5730"/>
-    <circle cx="410" cy="244" r="8" fill="#7a5730"/>
-
-    <!-- cab -->
-    <path d="M120 244 L214 244 L214 336 L92 336 L92 300 Q92 286 106 282 L150 272 Z" fill="url(#body)" stroke="#7a4d00" stroke-width="6" stroke-linejoin="round"/>
-    <!-- window -->
-    <path d="M132 260 L200 260 L200 296 L132 296 Z" fill="#2d5016" opacity="0.85"/>
-
-    <!-- chassis -->
-    <rect x="92" y="336" width="360" height="14" rx="6" fill="#3a2a10"/>
-
-    <!-- wheels -->
-    <g fill="#20140a">
-      <circle cx="158" cy="362" r="40"/>
-      <circle cx="330" cy="362" r="40"/>
-      <circle cx="410" cy="362" r="40"/>
-    </g>
-    <g fill="#c9c9c9">
-      <circle cx="158" cy="362" r="16"/>
-      <circle cx="330" cy="362" r="16"/>
-      <circle cx="410" cy="362" r="16"/>
+  <!-- truck + ground, scaled up into the top half -->
+  <g transform="translate(256,196) scale(0.62) translate(-256,-320)">
+    <path d="M40 372 Q150 330 256 356 Q380 386 472 356 L472 420 Q380 448 256 430 Q150 414 40 432 Z" fill="url(#ground)" opacity="0.9"/>
+    <g transform="translate(0,4)">
+      <path d="M238 250 L470 250 L440 336 L238 336 Z" fill="url(#body)" stroke="#7a4d00" stroke-width="6" stroke-linejoin="round"/>
+      <path d="M250 250 Q300 214 348 240 Q392 216 452 250 Z" fill="#6b4a24" stroke="#4d3418" stroke-width="4" stroke-linejoin="round"/>
+      <circle cx="300" cy="240" r="9" fill="#7a5730"/>
+      <circle cx="360" cy="236" r="7" fill="#7a5730"/>
+      <circle cx="410" cy="244" r="8" fill="#7a5730"/>
+      <path d="M120 244 L214 244 L214 336 L92 336 L92 300 Q92 286 106 282 L150 272 Z" fill="url(#body)" stroke="#7a4d00" stroke-width="6" stroke-linejoin="round"/>
+      <path d="M132 260 L200 260 L200 296 L132 296 Z" fill="#2d5016" opacity="0.85"/>
+      <rect x="92" y="336" width="360" height="14" rx="6" fill="#3a2a10"/>
+      <g fill="#20140a">
+        <circle cx="158" cy="362" r="40"/>
+        <circle cx="330" cy="362" r="40"/>
+        <circle cx="410" cy="362" r="40"/>
+      </g>
+      <g fill="#c9c9c9">
+        <circle cx="158" cy="362" r="16"/>
+        <circle cx="330" cy="362" r="16"/>
+        <circle cx="410" cy="362" r="16"/>
+      </g>
     </g>
   </g>
+
+  <!-- wordmark -->
+  <text x="256" y="380" text-anchor="middle" direction="rtl"
+        font-family="'Noto Sans Hebrew','Arial Hebrew',Arial,sans-serif"
+        font-size="82" font-weight="800" fill="#f4f8ee"
+        style="letter-spacing:1px">תעבורה</text>
+  <text x="256" y="440" text-anchor="middle" direction="rtl"
+        font-family="'Noto Sans Hebrew','Arial Hebrew',Arial,sans-serif"
+        font-size="46" font-weight="600" fill="#d4e9bc">חטיבת עפר</text>
 </svg>
