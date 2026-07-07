@@ -7,7 +7,7 @@ name: Deploy תעבורה PWA to GitHub Pages
 on:
   push:
     branches:
-      - claude/traffic-management-apk-36o58s
+      - main
   workflow_dispatch:
 
 permissions:
